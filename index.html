@@ -21,7 +21,7 @@ body{margin:0;font-family:Arial;background:#f3f3f3;color:#222}header{background:
 <script>
 const SUPABASE_URL="https://fwqvwdjxjpfnupzqqzbf.supabase.co";
 // Pegá tu Publishable key solamente acá, en tu copia local/GitHub Pages.
-const SUPABASE_KEY="sb_publishable_iY76QqAGI1Rd2e_2Ex4zZA_kZ7M0_bv";
+const SUPABASE_KEY="PEGAR_TU_PUBLISHABLE_KEY_AQUI";
 let sb=null,profile=null,admin=false,cart=[],P=[
 {n:"12025",b:"SKF",e:"12025-2RS",d:"Rulemán de rueda",i:25,o:52,w:15,l:18500,disc:20,v:["Renault Clio"],p:["Delantera"]},
 {n:"84690",b:"SKF",e:"84690",d:"Rulemán de rueda",i:30,o:62,w:16,l:8996,disc:20,v:["Renault Clio","Chevrolet Corsa"],p:["Delantera"]}
@@ -41,10 +41,79 @@ async function myOrders(){if(!profile)return openBox("login");let {data,error}=a
 async function adminLogin(){if(!ready())return msg("amsg","Falta pegar la Publishable key.","err");let {data,error}=await sb.auth.signInWithPassword({email:$("aemail").value.trim(),password:$("apass").value});if(error)return msg("amsg",error.message,"err");let r=await sb.from("profiles").select("*").eq("id",data.user.id).single();if(r.error||r.data.role!=="admin"){await sb.auth.signOut();return msg("amsg","Este usuario no es administrador.","err")}admin=true;closeBox("adminLogin");openBox("admin");adminOrders()}
 async function adminOrders(){let {data,error}=await sb.from("orders").select("*,profiles(name,email),order_items(*)").order("created_at",{ascending:false});if(error)return $("admincontent").textContent=error.message;$("admincontent").innerHTML=data.length?data.map(o=>`<div class="row"><b>#${o.id}</b> · ${o.profiles?.name||o.profiles?.email||""}<br>${new Date(o.created_at).toLocaleString("es-AR")}<br>${(o.order_items||[]).map(x=>x.number+" "+x.brand+" × "+x.quantity).join("<br>")}<br>Total: ${money(o.total)}<br><select onchange="status(${o.id},this.value)"><option ${o.status=="Pendiente"?"selected":""}>Pendiente</option><option ${o.status=="Preparando"?"selected":""}>Preparando</option><option ${o.status=="Enviado"?"selected":""}>Enviado</option><option ${o.status=="Entregado"?"selected":""}>Entregado</option></select></div>`).join(""):"No hay pedidos."}
 async function status(id,s){let r=await sb.from("orders").update({status:s}).eq("id",id);if(r.error)alert(r.error.message);else adminOrders()}
-async function adminClients(){let r=await sb.from("profiles").select("*").order("name");$("admincontent").innerHTML=r.error?r.error.message:r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Descuento: ${x.discount||0}% · ${x.role}</div>`).join("")}
+async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Descuento: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount||0)}" style="width:75px;padding:7px"> %</label> <button class="secondary" onclick="saveDiscount('${x.id}')">💾 Guardar</button><div id="discmsg_${x.id}" style="margin-top:6px"></div></div>`).join("")}
+async function saveDiscount(id){let input=$("disc_"+id),msgEl=$("discmsg_"+id),v=Number(input.value);if(!Number.isFinite(v)||v<0||v>100)return msgEl.textContent="Descuento inválido (0 a 100).";let r=await sb.from("profiles").update({discount:v}).eq("id",id);if(r.error){msgEl.textContent="No se pudo guardar: "+r.error.message;return}msgEl.textContent="✅ Guardado";}
 function loadExcel(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=x=>{let w=XLSX.read(new Uint8Array(x.target.result),{type:"array"}),s=w.Sheets[w.SheetNames.includes("Productos")?"Productos":w.SheetNames[0]],rows=XLSX.utils.sheet_to_json(s,{defval:""});P=rows.map(r=>({n:String(r.Numero||""),b:String(r.Marca||""),e:String(r.Equivalencia||""),d:String(r.Aplicacion||r.Descripcion||""),i:+r.Interior_mm||0,o:+r.Exterior_mm||0,w:+r.Ancho_mm||0,l:+r.Precio_Lista||0,disc:+r["Descuento_%"]||0,v:String(r.Vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),p:String(r.Posicion||"").split(",").map(x=>x.trim()).filter(Boolean)}));build();show(P);alert("Excel cargado: "+P.length+" productos")};r.readAsArrayBuffer(f)}
 function build(){let bs=[...new Set(P.flatMap(p=>p.v||[]).map(make))],ts=[...new Set(P.map(p=>p.d))],ps=[...new Set(P.flatMap(p=>p.p||[]))];$("brand").innerHTML="<option>Marca</option>"+bs.map(x=>`<option>${x}</option>`).join("");$("type").innerHTML='<option value="">Qué buscás</option>'+ts.map(x=>`<option>${x}</option>`).join("");$("pos").innerHTML='<option value="">Ubicación</option>'+ps.map(x=>`<option>${x}</option>`).join("")}
 function make(x){return String(x).trim().split(/\s+/)[0]}function models(){let b=$("brand").value;$("model").innerHTML="<option>Modelo</option>"+[...new Set(P.flatMap(p=>p.v||[]).filter(x=>make(x)==b))].map(x=>`<option>${x}</option>`).join("");vehicle()}function vehicle(){let b=$("brand").value,m=$("model").value,t=$("type").value,z=$("pos").value;show(P.filter(p=>(b=="Marca"||(p.v||[]).some(x=>make(x)==b))&&(m=="Modelo"||(p.v||[]).includes(m))&&(!t||p.d==t)&&(!z||(p.p||[]).includes(z))))}
 function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e)&&(!w||p.w==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){$(x).style.display="flex"}function closeBox(x){$(x).style.display="none"}function msg(id,t,c){$(id).textContent=t;$(id).className="status "+c}
 build();show(P);
-</script></body></html>
+</script>
+<style>
+#trClientsOverlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:99999;padding:30px;overflow:auto}
+#trClientsPanel{max-width:900px;margin:0 auto;background:#fff;border-radius:14px;padding:22px;color:#222}
+#trClientsPanel h2{margin-top:0}
+.tr-client{border:1px solid #ddd;border-radius:10px;padding:14px;margin:10px 0}
+.tr-client input{width:80px;padding:7px;margin-left:6px}
+.tr-client button{margin-left:8px;padding:7px 12px;cursor:pointer}
+</style>
+<div id="trClientsOverlay">
+  <div id="trClientsPanel">
+    <button onclick="closeTRClients()">✕ Cerrar</button>
+    <h2>👥 Clientes</h2>
+    <div id="trClientsStatus"></div>
+    <div id="trClientsList">Cargando...</div>
+  </div>
+</div>
+<script>
+async function openTRClients(){
+  const overlay=document.getElementById('trClientsOverlay');
+  overlay.style.display='block';
+  await loadTRClients();
+}
+function closeTRClients(){document.getElementById('trClientsOverlay').style.display='none';}
+async function loadTRClients(){
+  const list=document.getElementById('trClientsList');
+  const status=document.getElementById('trClientsStatus');
+  list.innerHTML='Cargando clientes...';
+  status.textContent='';
+  if(typeof supabase==='undefined'){
+    list.innerHTML='No se encontró la conexión con Supabase.';
+    return;
+  }
+  const {data,error}=await supabase.from('profiles')
+    .select('id,name,email,discount,role')
+    .order('name',{ascending:true});
+  if(error){
+    list.innerHTML='';
+    status.textContent='Error: '+error.message;
+    return;
+  }
+  list.innerHTML=(data||[]).map(p=>`
+    <div class="tr-client">
+      <b>${escapeTR(p.name||'Sin nombre')}</b><br>
+      ${escapeTR(p.email||'')}<br>
+      <small>${p.role==='admin'?'👑 Administrador':'👤 Cliente'}</small>
+      <div style="margin-top:9px">
+        Descuento:
+        <input id="trdisc_${p.id}" type="number" min="0" max="100" value="${Number(p.discount)||0}"> %
+        <button onclick="saveTRDiscount('${p.id}')">💾 Guardar</button>
+      </div>
+    </div>`).join('') || '<p>No hay perfiles.</p>';
+}
+function escapeTR(v){
+  return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+async function saveTRDiscount(id){
+  const input=document.getElementById('trdisc_'+id);
+  const discount=Math.max(0,Math.min(100,Number(input.value)||0));
+  const {error}=await supabase.from('profiles').update({discount}).eq('id',id);
+  if(error){
+    alert('No se pudo guardar el descuento: '+error.message);
+    return;
+  }
+  alert('Descuento guardado: '+discount+'%');
+  await loadTRClients();
+}
+</script>
+</body></html>
