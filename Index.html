@@ -48,4 +48,72 @@ function build(){let bs=[...new Set(P.flatMap(p=>p.v||[]).map(make))],ts=[...new
 function make(x){return String(x).trim().split(/\s+/)[0]}function models(){let b=$("brand").value;$("model").innerHTML="<option>Modelo</option>"+[...new Set(P.flatMap(p=>p.v||[]).filter(x=>make(x)==b))].map(x=>`<option>${x}</option>`).join("");vehicle()}function vehicle(){let b=$("brand").value,m=$("model").value,t=$("type").value,z=$("pos").value;show(P.filter(p=>(b=="Marca"||(p.v||[]).some(x=>make(x)==b))&&(m=="Modelo"||(p.v||[]).includes(m))&&(!t||p.d==t)&&(!z||(p.p||[]).includes(z))))}
 function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e)&&(!w||p.w==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){$(x).style.display="flex"}function closeBox(x){$(x).style.display="none"}function msg(id,t,c){$(id).textContent=t;$(id).className="status "+c}
 build();show(P);
-</script></body></html>
+</script>
+<style>
+#trClientsOverlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:99999;padding:30px;overflow:auto}
+#trClientsPanel{max-width:900px;margin:0 auto;background:#fff;border-radius:14px;padding:22px;color:#222}
+#trClientsPanel h2{margin-top:0}
+.tr-client{border:1px solid #ddd;border-radius:10px;padding:14px;margin:10px 0}
+.tr-client input{width:80px;padding:7px;margin-left:6px}
+.tr-client button{margin-left:8px;padding:7px 12px;cursor:pointer}
+</style>
+<div id="trClientsOverlay">
+  <div id="trClientsPanel">
+    <button onclick="closeTRClients()">✕ Cerrar</button>
+    <h2>👥 Clientes</h2>
+    <div id="trClientsStatus"></div>
+    <div id="trClientsList">Cargando...</div>
+  </div>
+</div>
+<script>
+async function openTRClients(){
+  const overlay=document.getElementById('trClientsOverlay');
+  overlay.style.display='block';
+  await loadTRClients();
+}
+function closeTRClients(){document.getElementById('trClientsOverlay').style.display='none';}
+async function loadTRClients(){
+  const list=document.getElementById('trClientsList');
+  const status=document.getElementById('trClientsStatus');
+  list.innerHTML='Cargando clientes...';
+  status.textContent='';
+  if(typeof supabase==='undefined'){
+    list.innerHTML='No se encontró la conexión con Supabase.';
+    return;
+  }
+  const {data,error}=await supabase.from('profiles')
+    .select('id,name,email,discount,role')
+    .order('name',{ascending:true});
+  if(error){
+    list.innerHTML='';
+    status.textContent='Error: '+error.message;
+    return;
+  }
+  list.innerHTML=(data||[]).map(p=>`
+    <div class="tr-client">
+      <b>${escapeTR(p.name||'Sin nombre')}</b><br>
+      ${escapeTR(p.email||'')}<br>
+      <small>${p.role==='admin'?'👑 Administrador':'👤 Cliente'}</small>
+      <div style="margin-top:9px">
+        Descuento:
+        <input id="trdisc_${p.id}" type="number" min="0" max="100" value="${Number(p.discount)||0}"> %
+        <button onclick="saveTRDiscount('${p.id}')">💾 Guardar</button>
+      </div>
+    </div>`).join('') || '<p>No hay perfiles.</p>';
+}
+function escapeTR(v){
+  return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+async function saveTRDiscount(id){
+  const input=document.getElementById('trdisc_'+id);
+  const discount=Math.max(0,Math.min(100,Number(input.value)||0));
+  const {error}=await supabase.from('profiles').update({discount}).eq('id',id);
+  if(error){
+    alert('No se pudo guardar el descuento: '+error.message);
+    return;
+  }
+  alert('Descuento guardado: '+discount+'%');
+  await loadTRClients();
+}
+</script>
+</body></html>
