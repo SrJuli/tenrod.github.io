@@ -47,6 +47,8 @@ async function adminOrders(){
 
   if(error)return $("admincontent").textContent=error.message;
 
+  window.ADMIN_ORDERS=data||[];
+
   $("admincontent").innerHTML=data.length
     ? data.map(o=>`
       <div class="row">
@@ -74,6 +76,216 @@ async function adminOrders(){
       </div>
     `).join("")
     : "No hay pedidos.";
+}
+  function printRemito(id){
+  let o=(window.ADMIN_ORDERS||[]).find(x=>String(x.id)===String(id));
+
+  if(!o){
+    alert("No se encontró el pedido.");
+    return;
+  }
+
+  let cliente=o.profiles?.name||o.profiles?.email||"Sin cliente";
+  let email=o.profiles?.email||"";
+
+  let items=(o.order_items||[]).map(x=>`
+    <tr>
+      <td>${x.number||""}</td>
+      <td>${x.description||""}</td>
+      <td>${x.brand||""}</td>
+      <td>${x.quantity||0}</td>
+      <td>${money(x.unit_price)}</td>
+      <td>${money((Number(x.unit_price)||0)*(Number(x.quantity)||0))}</td>
+    </tr>
+  `).join("");
+
+  let fecha=new Date(o.created_at);
+
+  let w=window.open("","_blank","width=900,height=1100");
+
+  if(!w){
+    alert("El navegador bloqueó la ventana de impresión.");
+    return;
+  }
+
+  w.document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Remito TEN ROD - Pedido #${o.id}</title>
+
+      <style>
+        body{
+          font-family:Arial,sans-serif;
+          margin:40px;
+          color:#111;
+        }
+
+        .remito{
+          max-width:800px;
+          margin:auto;
+          border:1px solid #222;
+          padding:25px;
+        }
+
+        .cabecera{
+          display:flex;
+          justify-content:space-between;
+          border-bottom:3px solid #f58220;
+          padding-bottom:15px;
+        }
+
+        .logo{
+          font-size:38px;
+          font-weight:bold;
+        }
+
+        .logo span{
+          color:#f58220;
+        }
+
+        h1{
+          margin:0;
+        }
+
+        .numero{
+          border:2px solid #111;
+          padding:8px 15px;
+          margin-top:8px;
+          font-weight:bold;
+        }
+
+        .datos{
+          margin:20px 0;
+        }
+
+        table{
+          width:100%;
+          border-collapse:collapse;
+          margin-top:20px;
+        }
+
+        th{
+          background:#f58220;
+          padding:8px;
+          border:1px solid #222;
+        }
+
+        td{
+          padding:8px;
+          border:1px solid #777;
+        }
+
+        .total{
+          text-align:right;
+          font-size:20px;
+          font-weight:bold;
+          margin-top:20px;
+        }
+
+        .firma{
+          margin-top:80px;
+          text-align:right;
+        }
+
+        .firma div{
+          display:inline-block;
+          width:250px;
+          border-top:1px solid #111;
+          text-align:center;
+          padding-top:8px;
+        }
+
+        .pie{
+          margin-top:35px;
+          border-top:2px solid #f58220;
+          padding-top:10px;
+          text-align:center;
+          font-size:12px;
+        }
+
+        @media print{
+          body{
+            margin:0;
+          }
+        }
+      </style>
+    </head>
+
+    <body>
+
+      <div class="remito">
+
+        <div class="cabecera">
+
+          <div>
+            <div class="logo">
+              <span>TEN</span> ROD
+            </div>
+            <small>RODAMIENTOS Y REPUESTOS</small>
+          </div>
+
+          <div>
+            <h1>REMITO</h1>
+            <div class="numero">
+              N° ${String(o.id).padStart(8,"0")}
+            </div>
+          </div>
+
+        </div>
+
+        <div class="datos">
+          <b>Cliente:</b> ${cliente}<br>
+          <b>Email:</b> ${email||"—"}<br>
+          <b>Fecha:</b> ${fecha.toLocaleDateString("es-AR")}<br>
+          <b>Estado:</b> ${o.status||"Pendiente"}
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Descripción</th>
+              <th>Marca</th>
+              <th>Cant.</th>
+              <th>Precio</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${items}
+          </tbody>
+        </table>
+
+        <div class="total">
+          TOTAL: ${money(o.total)}
+        </div>
+
+        <div class="firma">
+          <div>
+            Firma / Aclaración
+          </div>
+        </div>
+
+        <div class="pie">
+          TEN ROD · RODAMIENTOS Y REPUESTOS
+        </div>
+
+      </div>
+
+      <script>
+        window.onload=function(){
+          window.print();
+        };
+      <\/script>
+
+    </body>
+    </html>
+  `);
+
+  w.document.close();
 }
 async function status(id,s){let r=await sb.from("orders").update({status:s}).eq("id",id);if(r.error)alert(r.error.message);else adminOrders()}
 async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Descuento: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount||0)}" style="width:75px;padding:7px"> %</label> <button class="secondary" onclick="saveDiscount('${x.id}')">💾 Guardar</button><div id="discmsg_${x.id}" style="margin-top:6px"></div></div>`).join("")}
