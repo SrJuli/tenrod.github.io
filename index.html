@@ -290,7 +290,72 @@ async function adminOrders(){
 async function status(id,s){let r=await sb.from("orders").update({status:s}).eq("id",id);if(r.error)alert(r.error.message);else adminOrders()}
 async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Descuento: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount||0)}" style="width:75px;padding:7px"> %</label> <button class="secondary" onclick="saveDiscount('${x.id}')">💾 Guardar</button><div id="discmsg_${x.id}" style="margin-top:6px"></div></div>`).join("")}
 async function saveDiscount(id){let input=$("disc_"+id),msgEl=$("discmsg_"+id),v=Number(input.value);if(!Number.isFinite(v)||v<0||v>100)return msgEl.textContent="Descuento inválido (0 a 100).";let r=await sb.from("profiles").update({discount:v}).eq("id",id);if(r.error){msgEl.textContent="No se pudo guardar: "+r.error.message;return}msgEl.textContent="✅ Guardado";}
-function loadExcel(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=x=>{let w=XLSX.read(new Uint8Array(x.target.result),{type:"array"}),s=w.Sheets[w.SheetNames.includes("Productos")?"Productos":w.SheetNames[0]],rows=XLSX.utils.sheet_to_json(s,{defval:""});P=rows.map(r=>({n:String(r.Numero||""),b:String(r.Marca||""),e:String(r.Equivalencia||""),d:String(r.Aplicacion||r.Descripcion||""),i:+r.Interior_mm||0,o:+r.Exterior_mm||0,w:+r.Ancho_mm||0,l:+r.Precio_Lista||0,disc:+r["Descuento_%"]||0,v:String(r.Vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),p:String(r.Posicion||"").split(",").map(x=>x.trim()).filter(Boolean)}));build();show(P);alert("Excel cargado: "+P.length+" productos")};r.readAsArrayBuffer(f)}
+async function loadExcel(e){
+  let f=e.target.files[0];
+  if(!f)return;
+
+  let r=new FileReader();
+
+  r.onload=async x=>{
+    try{
+      let w=XLSX.read(new Uint8Array(x.target.result),{type:"array"});
+      let s=w.Sheets[w.SheetNames.includes("Productos")?"Productos":w.SheetNames[0]];
+      let rows=XLSX.utils.sheet_to_json(s,{defval:""});
+
+      P=rows.map(r=>({
+        n:String(r.Numero||""),
+        b:String(r.Marca||""),
+        e:String(r.Equivalencia||""),
+        d:String(r.Aplicacion||r.Descripcion||""),
+        i:+r.Interior_mm||0,
+        o:+r.Exterior_mm||0,
+        w:+r.Ancho_mm||0,
+        l:+r.Precio_Lista||0,
+        disc:+r["Descuento_%"]||0,
+        v:String(r.Vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),
+        p:String(r.Posicion||"").split(",").map(x=>x.trim()).filter(Boolean)
+      }));
+
+      let productos=P.map(p=>({
+        numero:p.n,
+        marca:p.b,
+        equivalencia:p.e,
+        aplicacion:p.d,
+        interior_mm:p.i,
+        exterior_mm:p.o,
+        ancho_mm:p.w,
+        precio_lista:p.l,
+        descuento:p.disc,
+        vehiculo:(p.v||[]).join(", "),
+        posicion:(p.p||[]).join(", ")
+      }));
+
+      let del=await sb.from("products").delete().neq("id",0);
+
+      if(del.error){
+        alert("No se pudo limpiar la tabla products: "+del.error.message);
+        return;
+      }
+
+      let ins=await sb.from("products").insert(productos);
+
+      if(ins.error){
+        alert("No se pudieron guardar los productos: "+ins.error.message);
+        return;
+      }
+
+      build();
+      show(P);
+
+      alert("Excel cargado correctamente: "+P.length+" productos");
+
+    }catch(err){
+      alert("Error al cargar Excel: "+err.message);
+    }
+  };
+
+  r.readAsArrayBuffer(f);
+}
 function build(){let bs=[...new Set(P.flatMap(p=>p.v||[]).map(make))],ts=[...new Set(P.map(p=>p.d))],ps=[...new Set(P.flatMap(p=>p.p||[]))];$("brand").innerHTML="<option>Marca</option>"+bs.map(x=>`<option>${x}</option>`).join("");$("type").innerHTML='<option value="">Qué buscás</option>'+ts.map(x=>`<option>${x}</option>`).join("");$("pos").innerHTML='<option value="">Ubicación</option>'+ps.map(x=>`<option>${x}</option>`).join("")}
 function make(x){return String(x).trim().split(/\s+/)[0]}function models(){let b=$("brand").value;$("model").innerHTML="<option>Modelo</option>"+[...new Set(P.flatMap(p=>p.v||[]).filter(x=>make(x)==b))].map(x=>`<option>${x}</option>`).join("");vehicle()}function vehicle(){let b=$("brand").value,m=$("model").value,t=$("type").value,z=$("pos").value;show(P.filter(p=>(b=="Marca"||(p.v||[]).some(x=>make(x)==b))&&(m=="Modelo"||(p.v||[]).includes(m))&&(!t||p.d==t)&&(!z||(p.p||[]).includes(z))))}
 function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e)&&(!w||p.w==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){$(x).style.display="flex"}function closeBox(x){$(x).style.display="none"}function msg(id,t,c){$(id).textContent=t;$(id).className="status "+c}
