@@ -359,5 +359,36 @@ async function loadExcel(e){
 function build(){let bs=[...new Set(P.flatMap(p=>p.v||[]).map(make))],ts=[...new Set(P.map(p=>p.d))],ps=[...new Set(P.flatMap(p=>p.p||[]))];$("brand").innerHTML="<option>Marca</option>"+bs.map(x=>`<option>${x}</option>`).join("");$("type").innerHTML='<option value="">Qué buscás</option>'+ts.map(x=>`<option>${x}</option>`).join("");$("pos").innerHTML='<option value="">Ubicación</option>'+ps.map(x=>`<option>${x}</option>`).join("")}
 function make(x){return String(x).trim().split(/\s+/)[0]}function models(){let b=$("brand").value;$("model").innerHTML="<option>Modelo</option>"+[...new Set(P.flatMap(p=>p.v||[]).filter(x=>make(x)==b))].map(x=>`<option>${x}</option>`).join("");vehicle()}function vehicle(){let b=$("brand").value,m=$("model").value,t=$("type").value,z=$("pos").value;show(P.filter(p=>(b=="Marca"||(p.v||[]).some(x=>make(x)==b))&&(m=="Modelo"||(p.v||[]).includes(m))&&(!t||p.d==t)&&(!z||(p.p||[]).includes(z))))}
 function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e)&&(!w||p.w==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){$(x).style.display="flex"}function closeBox(x){$(x).style.display="none"}function msg(id,t,c){$(id).textContent=t;$(id).className="status "+c}
-build();show(P);
+async function loadProducts(){
+  if(!ready())return;
+
+  let {data,error}=await sb
+    .from("products")
+    .select("*")
+    .order("id");
+
+  if(error){
+    console.error("Error cargando productos:",error);
+    return;
+  }
+
+  P=data.map(p=>({
+    n:String(p.numero||""),
+    b:String(p.marca||""),
+    e:String(p.equivalencia||""),
+    d:String(p.aplicacion||""),
+    i:Number(p.interior_mm||0),
+    o:Number(p.exterior_mm||0),
+    w:Number(p.ancho_mm||0),
+    l:Number(p.precio_lista||0),
+    disc:Number(p.descuento||0),
+    v:String(p.vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),
+    p:String(p.posicion||"").split(",").map(x=>x.trim()).filter(Boolean)
+  }));
+
+  build();
+  show(P);
+}
+
+loadProducts();
   </script></body></html>
