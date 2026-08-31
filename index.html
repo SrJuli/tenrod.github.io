@@ -363,7 +363,8 @@ oferta:String(r.Oferta||"").trim().toUpperCase()==="SI"
         descuento:p.disc,
         vehiculo:(p.v||[]).join(", "),
 posicion:(p.p||[]).join(", "),
-stock:p.stock
+stock:p.stock,
+oferta:p.oferta
       }));
 
       let del=await sb.from("products").delete().neq("id",0);
