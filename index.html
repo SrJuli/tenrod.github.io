@@ -328,7 +328,8 @@ stock:+r.Stock||0
         precio_lista:p.l,
         descuento:p.disc,
         vehiculo:(p.v||[]).join(", "),
-        posicion:(p.p||[]).join(", ")
+posicion:(p.p||[]).join(", "),
+stock:p.stock
       }));
 
       let del=await sb.from("products").delete().neq("id",0);
