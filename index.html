@@ -36,7 +36,6 @@ function show(a){
 
   $("results").innerHTML=a.map((p,i)=>{
     let stock=Number(p.stock||0);
-oferta:p.oferta===true
     let semaforo=stock>=5?"🟢":stock>=1?"🟡":"🔴";
 
     return `<article class="card">
