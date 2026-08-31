@@ -35,14 +35,14 @@ function show(a){
   let mk=+$("mk").value||0;
 
   $("results").innerHTML=a.map((p,i)=>{
-    let stock=Number(p.stock||0);
+    let stock:Number(p.stock||0),
+oferta:p.oferta===true
     let semaforo=stock>=5?"🟢":stock>=1?"🟡":"🔴";
 
     return `<article class="card">
       <h2>${p.n}</h2>
       <div class="brand">${p.b}</div>
 ${p.oferta ? '<div style="font-weight:bold;margin:8px 0">🔥 OFERTA</div>' : ''}
-
       <p>
         Equivalencia: ${p.e}<br>
         ${p.d}<br>
