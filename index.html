@@ -30,9 +30,42 @@ let sb=null,profile=null,admin=false,cart=[],P=[
 const $=id=>document.getElementById(id), money=x=>"$"+Math.round(x||0).toLocaleString("es-AR");
 function ready(){if(SUPABASE_KEY.startsWith("PEGAR_"))return false;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return true}
 function price(p){let d=profile?Number(profile.discount||0):Number(p.disc||0);return p.l*(1-d/100)}
-function show(a){current=a;let mk=+$("mk").value||0;$("results").innerHTML=a.map((p,i)=>`<article class="card"><h2>${p.n}</h2><div class="brand">${p.b}</div><p>Equivalencia: ${p.e}<br>${p.d}<br>Medidas: ${p.i} × ${p.o} × ${p.w} mm<br>Vehículos: ${(p.v||[]).join(", ")}</p><span class="old">${money(p.l)}</span><br><span class="price">${money(price(p))}</span><p>Venta sugerida: <b>${money(price(p)*(1+mk/100))}</b></p><button class="cartbtn" onclick="add(${i})">🛒 Agregar</button></article>`).join("")||"<div class='card'>No hay resultados.</div>";$("count").textContent="("+a.length+")"}
-function add(i){let p=current[i],x=cart.find(x=>x.p===p);x?x.qty++:cart.push({p,qty:1});update();cartOpen()}
-function update(){$("cc").textContent=cart.reduce((s,x)=>s+x.qty,0)}
+function show(a){
+  current=a;
+  let mk=+$("mk").value||0;
+
+  $("results").innerHTML=a.map((p,i)=>{
+    let stock=Number(p.stock||0);
+    let semaforo=stock>=5?"🟢":stock>=1?"🟡":"🔴";
+
+    return `<article class="card">
+      <h2>${p.n}</h2>
+      <div class="brand">${p.b}</div>
+
+      <p>
+        Equivalencia: ${p.e}<br>
+        ${p.d}<br>
+        Medidas: ${p.i} × ${p.o} × ${p.w} mm<br>
+        Vehículos: ${(p.v||[]).join(", ")}
+      </p>
+
+      <div style="font-size:28px;margin:8px 0" title="Disponibilidad">
+        ${semaforo}
+      </div>
+
+      <span class="old">${money(p.l)}</span><br>
+      <span class="price">${money(price(p))}</span>
+
+      <p>Venta sugerida: <b>${money(price(p)*(1+mk/100))}</b></p>
+
+      <button class="cartbtn" onclick="add(${i})">
+        🛒 Agregar
+      </button>
+    </article>`;
+  }).join("")||"<div class='card'>No hay resultados.</div>";
+
+  $("count").textContent="("+a.length+")";
+}
 function cartOpen(){let t=0;$("cartitems").innerHTML=cart.length?cart.map((x,i)=>{let z=price(x.p)*x.qty;t+=z;return `<div class="row"><b>${x.p.n} ${x.p.b}</b> × ${x.qty} — ${money(z)} <button onclick="changeQty(${i},-1)">−</button><button onclick="changeQty(${i},1)">+</button><button onclick="changeQty(${i},-99)">🗑️</button></div>`}).join(""):"Carrito vacío";$("carttotal").innerHTML=cart.length?`<h2>Total: ${money(t)}</h2>`:"";openBox("cart")}
 function changeQty(i,n){if(n===-99)cart.splice(i,1);else{cart[i].qty+=n;if(cart[i].qty<1)cart.splice(i,1)}update();cartOpen()}
 async function login(){if(!ready())return msg("lmsg","Falta pegar la Publishable key.","err");let {data,error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pass").value});if(error)return msg("lmsg",error.message,"err");let r=await sb.from("profiles").select("*").eq("id",data.user.id).single();if(r.error)return msg("lmsg","Usuario sin perfil en profiles.","err");profile=r.data;$("uname").textContent=profile.name||data.user.email;$("udisc").textContent=(profile.discount||0)+"%";$("userbar").classList.remove("hidden");closeBox("login");show(current)}
