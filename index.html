@@ -347,7 +347,8 @@ async function loadExcel(e){
         disc:+r["Descuento_%"]||0,
        v:String(r.Vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),
 p:String(r.Posicion||"").split(",").map(x=>x.trim()).filter(Boolean),
-stock:+r.Stock||0
+stock:+r.Stock||0,
+oferta:String(r.Oferta||"").trim().toUpperCase()==="SI"
       }));
 
       let productos=P.map(p=>({
