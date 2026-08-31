@@ -418,7 +418,8 @@ async function loadProducts(){
     l:Number(p.precio_lista||0),
     disc:Number(p.descuento||0),
     v:String(p.vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),
-    p:String(p.posicion||"").split(",").map(x=>x.trim()).filter(Boolean)
+    p:String(p.posicion||"").split(",").map(x=>x.trim()).filter(Boolean),
+stock:Number(p.stock||0)
   }));
 
   build();
