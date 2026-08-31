@@ -35,7 +35,7 @@ function show(a){
   let mk=+$("mk").value||0;
 
   $("results").innerHTML=a.map((p,i)=>{
-    let stock:Number(p.stock||0),
+    let stock=Number(p.stock||0);
 oferta:p.oferta===true
     let semaforo=stock>=5?"🟢":stock>=1?"🟡":"🔴";
 
