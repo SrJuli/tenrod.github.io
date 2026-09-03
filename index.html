@@ -102,7 +102,36 @@ function cartOpen(){let t=0;$("cartitems").innerHTML=cart.length?cart.map((x,i)=
 function changeQty(i,n){if(n===-99)cart.splice(i,1);else{cart[i].qty+=n;if(cart[i].qty<1)cart.splice(i,1)}update();cartOpen()}
 function showApp(){$("landing").classList.add("hidden");$("app").classList.remove("hidden")}
 function showLanding(){$("app").classList.add("hidden");$("landing").classList.remove("hidden")}
-async function login(){if(!ready())return msg("lmsg","Falta pegar la Publishable key.","err");let {data,error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pass").value});if(error)return msg("lmsg",error.message,"err");let r=await sb.from("profiles").select("*").eq("id",data.user.id).single();if(r.error)return msg("lmsg","Usuario sin perfil en profiles.","err");profile=r.data;$("uname").textContent=profile.name||data.user.email;$("udisc").textContent=(profile.discount||0)+"%";$("userbar").classList.remove("hidden");closeBox("login");showApp();show(current)}
+async function login(){
+  if(!ready())return msg("lmsg","Falta pegar la Publishable key.","err");
+
+  let {data,error}=await sb.auth.signInWithPassword({
+    email:$("email").value.trim(),
+    password:$("pass").value
+  });
+
+  if(error)return msg("lmsg",error.message,"err");
+
+  let r=await sb.from("profiles")
+    .select("*")
+    .eq("id",data.user.id)
+    .single();
+
+  if(r.error)return msg("lmsg","Usuario sin perfil en profiles.","err");
+
+  profile=r.data;
+
+  // Mostrar nombre y descuento asignado por el administrador
+  $("uname").textContent=profile.name||data.user.email;
+  $("udisc").textContent=Number(profile.discount||0)+"%";
+
+  $("userbar").classList.remove("hidden");
+
+  // Cerrar login y mostrar solamente el catálogo
+  closeBox("login");
+  showApp();
+  show(current);
+}
 async function logout(){if(sb)await sb.auth.signOut();profile=null;admin=false;cart=[];update();$("userbar").classList.add("hidden");showLanding()}
 async function sendOrder(){if(!profile)return openBox("login");if(!cart.length)return alert("Carrito vacío");let total=cart.reduce((s,x)=>s+price(x.p)*x.qty,0);let {data:o,error}=await sb.from("orders").insert({user_id:profile.id,total,status:"Pendiente"}).select().single();if(error)return alert(error.message);let items=cart.map(x=>({order_id:o.id,number:x.p.n,brand:x.p.b,description:x.p.d,quantity:x.qty,unit_price:price(x.p)}));let e=await sb.from("order_items").insert(items);if(e.error)return alert(e.error.message);cart=[];update();closeBox("cart");alert("Pedido enviado. N° "+o.id);myOrders()}
 async function myOrders(){if(!profile)return openBox("login");let {data,error}=await sb.from("orders").select("*,order_items(*)").eq("user_id",profile.id).order("created_at",{ascending:false});if(error)return alert(error.message);$("orderslist").innerHTML=data.length?data.map(o=>`<div class="row"><b>Pedido #${o.id}</b> · ${new Date(o.created_at).toLocaleString("es-AR")}<br>Estado: <b>${o.status}</b><br>${(o.order_items||[]).map(x=>x.number+" "+x.brand+" × "+x.quantity).join("<br>")}<br>Total: ${money(o.total)}</div>`).join(""):"No tenés pedidos.";openBox("orders")}
