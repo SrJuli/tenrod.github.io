@@ -126,9 +126,10 @@ async function login(){
   $("udisc").textContent=Number(profile.discount||0)+"%";
 
   $("userbar").classList.remove("hidden");
+$("clientLoginBtn").classList.add("hidden");
 
-  // Cerrar login y mostrar solamente el catálogo
-  closeBox("login");
+// Cerrar login y mostrar solamente el catálogo
+closeBox("login");
   showApp();
   show(current);
 }
