@@ -18,7 +18,7 @@ body{margin:0;font-family:Arial;background:#f3f3f3;color:#222}header{background:
     </div>
   </div>
 </section>
-<div id="app" class="hidden">
+<div id="app" style="display:none;">
 <header><div class="wrap top"><div><div class="logo">TEN ROD</div><small>Rodamientos · Tensores · Pedidos</small></div><div><button id="clientLoginBtn" class="btn" onclick="openBox('login')">👤 Ingresar</button><button class="btn" onclick="openBox('adminLogin')">🔐 Admin</button></div></div></header>
 <main class="wrap"><div class="banner">🟧 <b>TEN ROD v8</b> · Usuarios y pedidos con Supabase.</div>
 <div id="userbar" class="userbar hidden">👤 <b id="uname"></b> · Descuento: <b id="udisc">0%</b> <button class="secondary" onclick="myOrders()">📋 Mis pedidos</button> <button class="secondary" onclick="logout()">Salir</button></div>
