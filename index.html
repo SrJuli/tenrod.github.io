@@ -146,40 +146,78 @@ async function sendOrder(){if(!profile)return openBox("login");if(!cart.length)r
 async function myOrders(){if(!profile)return openBox("login");let {data,error}=await sb.from("orders").select("*,order_items(*)").eq("user_id",profile.id).order("created_at",{ascending:false});if(error)return alert(error.message);$("orderslist").innerHTML=data.length?data.map(o=>`<div class="row"><b>Pedido #${o.id}</b> · ${new Date(o.created_at).toLocaleString("es-AR")}<br>Estado: <b>${o.status}</b><br>${(o.order_items||[]).map(x=>x.number+" "+x.brand+" × "+x.quantity).join("<br>")}<br>Total: ${money(o.total)}</div>`).join(""):"No tenés pedidos.";openBox("orders")}
 async function adminLogin(){if(!ready())return msg("amsg","Falta pegar la Publishable key.","err");let {data,error}=await sb.auth.signInWithPassword({email:$("aemail").value.trim(),password:$("apass").value});if(error)return msg("amsg",error.message,"err");let r=await sb.from("profiles").select("*").eq("id",data.user.id).single();if(r.error||r.data.role!=="admin"){await sb.auth.signOut();return msg("amsg","Este usuario no es administrador.","err")}admin=true;closeBox("adminLogin");showApp();openBox("admin");adminOrders()}
 async function adminOrders(){
-  let {data,error}=await sb.from("orders")
-    .select("*,profiles(name,email),order_items(*)")
+
+  let {data:orders,error}=await sb
+    .from("orders")
+    .select("*,order_items(*)")
     .order("created_at",{ascending:false});
 
-  if(error)return $("admincontent").textContent=error.message;
+  if(error){
+    return $("admincontent").textContent=error.message;
+  }
 
-  window.ADMIN_ORDERS=data||[];
+  let {data:profiles}=await sb
+    .from("profiles")
+    .select("id,name,email");
 
-  $("admincontent").innerHTML=data.length
-    ? data.map(o=>`
-      <div class="row">
-        <b>#${o.id}</b> · ${o.profiles?.name||o.profiles?.email||""}
-        <br>
-        ${new Date(o.created_at).toLocaleString("es-AR")}
-        <br>
-        ${(o.order_items||[])
-          .map(x=>x.number+" "+x.brand+" × "+x.quantity)
-          .join("<br>")}
-        <br>
-        Total: ${money(o.total)}
-        <br><br>
+  let clientes={};
 
-        <button class="secondary" onclick="printRemito(${o.id})">
-          🖨️ Imprimir remito
-        </button>
+  (profiles||[]).forEach(p=>{
+    clientes[p.id]=p;
+  });
 
-        <select onchange="status(${o.id},this.value)">
-          <option ${o.status=="Pendiente"?"selected":""}>Pendiente</option>
-          <option ${o.status=="Preparando"?"selected":""}>Preparando</option>
-          <option ${o.status=="Enviado"?"selected":""}>Enviado</option>
-          <option ${o.status=="Entregado"?"selected":""}>Entregado</option>
-        </select>
-      </div>
-    `).join("")
+  window.ADMIN_ORDERS=orders||[];
+
+  $("admincontent").innerHTML=orders.length
+    ? orders.map(o=>{
+
+        let cliente=clientes[o.user_id];
+
+        return `
+          <div class="row">
+
+            <b>Pedido #${o.id}</b>
+
+            <br>
+
+            👤 <b>Cliente:</b>
+            ${cliente?.name||cliente?.email||"Sin nombre"}
+
+            <br>
+
+            📧 ${cliente?.email||"—"}
+
+            <br>
+
+            📅 ${new Date(o.created_at).toLocaleString("es-AR")}
+
+            <br>
+
+            ${(o.order_items||[])
+              .map(x=>x.number+" "+x.brand+" × "+x.quantity)
+              .join("<br>")}
+
+            <br>
+
+            💰 Total: ${money(o.total)}
+
+            <br><br>
+
+            <button class="secondary" onclick="printRemito(${o.id})">
+              🖨️ Imprimir remito
+            </button>
+
+            <select onchange="status(${o.id},this.value)">
+              <option ${o.status=="Pendiente"?"selected":""}>Pendiente</option>
+              <option ${o.status=="Preparando"?"selected":""}>Preparando</option>
+              <option ${o.status=="Enviado"?"selected":""}>Enviado</option>
+              <option ${o.status=="Entregado"?"selected":""}>Entregado</option>
+            </select>
+
+          </div>
+        `;
+
+      }).join("")
     : "No hay pedidos.";
 }
   function printRemito(id){
