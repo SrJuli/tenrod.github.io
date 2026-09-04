@@ -101,7 +101,11 @@ function update(){
 }
 function cartOpen(){let t=0;$("cartitems").innerHTML=cart.length?cart.map((x,i)=>{let z=price(x.p)*x.qty;t+=z;return `<div class="row"><b>${x.p.n} ${x.p.b}</b> × ${x.qty} — ${money(z)} <button onclick="changeQty(${i},-1)">−</button><button onclick="changeQty(${i},1)">+</button><button onclick="changeQty(${i},-99)">🗑️</button></div>`}).join(""):"Carrito vacío";$("carttotal").innerHTML=cart.length?`<h2>Total: ${money(t)}</h2>`:"";openBox("cart")}
 function changeQty(i,n){if(n===-99)cart.splice(i,1);else{cart[i].qty+=n;if(cart[i].qty<1)cart.splice(i,1)}update();cartOpen()}
-function showApp(){$("landing").classList.add("hidden");$("app").classList.remove("hidden")}
+function showApp(){
+  $("landing").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("app").style.display="block";
+}
 function showLanding(){$("app").classList.add("hidden");$("landing").classList.remove("hidden")}
 async function login(){
   if(!ready())return msg("lmsg","Falta pegar la Publishable key.","err");
