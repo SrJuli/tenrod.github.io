@@ -147,9 +147,11 @@ async function myOrders(){if(!profile)return openBox("login");let {data,error}=a
 async function adminLogin(){if(!ready())return msg("amsg","Falta pegar la Publishable key.","err");let {data,error}=await sb.auth.signInWithPassword({email:$("aemail").value.trim(),password:$("apass").value});if(error)return msg("amsg",error.message,"err");let r=await sb.from("profiles").select("*").eq("id",data.user.id).single();if(r.error||r.data.role!=="admin"){await sb.auth.signOut();return msg("amsg","Este usuario no es administrador.","err")}admin=true;closeBox("adminLogin");showApp();openBox("admin");adminOrders()}
 async function adminOrders(){
 
-  let {data:orders,error}=await sb
+  let {data:profiles,error:perror}=await sb
     .from("orders")
     .select("*,order_items(*)")
+    console.log("PERFILES:", profiles);
+console.log("ERROR PERFILES:", perror);
     .order("created_at",{ascending:false});
 
   if(error){
