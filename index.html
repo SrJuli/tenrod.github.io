@@ -157,8 +157,10 @@ async function adminOrders(){
   }
 
   let {data:profiles, error:perror}=await sb
-    .from("profiles")
-    .select("id,name,email");
+  .from("profiles")
+  .select("id,name,email");
+
+alert(JSON.stringify(profiles));
 
   if(perror){
     console.error("Error cargando perfiles:",perror);
