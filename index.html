@@ -21,7 +21,7 @@ body{margin:0;font-family:Arial;background:#f3f3f3;color:#222}header{background:
 <div id="app" style="display:none;">
 <header><div class="wrap top"><div><div class="logo">TEN ROD</div><small>Rodamientos · Tensores · Pedidos</small></div><div><button id="clientLoginBtn" class="btn" onclick="openBox('login')">👤 Ingresar</button><button class="btn" onclick="openBox('adminLogin')">🔐 Admin</button></div></div></header>
 <main class="wrap"><div class="banner">🟧 <b>TEN ROD v8</b> · Usuarios y pedidos con Supabase.</div>
-<div id="userbar" class="userbar hidden">👤 <b id="uname"></b> · Descuento: <b id="udisc">0%</b> <button class="secondary" onclick="myOrders()">📋 Mis pedidos</button> <button class="secondary" onclick="logout()">Salir</button></div>
+<div id="userbar" class="userbar hidden">👤 <b id="uname"></b> · Descuento: <b id="udisc">0%</b> · Tensores: <b id="udiscT">0%</b> · Retenes: <b id="udiscR">0%</b> <button class="secondary" onclick="myOrders()">📋 Mis pedidos</button> <button class="secondary" onclick="logout()">Salir</button></div>
 <section class="box"><h2>🔎 Buscar rodamiento</h2><input id="q" class="search" placeholder="Número, equivalencia, marca o aplicación..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
 <div id="v" class="mode hidden"><div class="fields"><select id="brand" onchange="models()"><option>Marca</option></select><select id="model" onchange="vehicle()"><option>Modelo</option></select><select id="type" onchange="vehicle()"><option value="">Qué buscás</option></select><select id="pos" onchange="vehicle()"><option value="">Ubicación</option></select></div></div>
 <div id="m" class="mode hidden"><div class="fields"><input id="mi" placeholder="Interior mm"><input id="me" placeholder="Exterior mm"><input id="mw" placeholder="Ancho mm"><button onclick="measure()">Buscar</button></div></div></section>
@@ -45,7 +45,31 @@ let sb=null,profile=null,admin=false,cart=[],P=[
 ],current=P;
 const $=id=>document.getElementById(id), money=x=>"$"+Math.round(x||0).toLocaleString("es-AR");
 function ready(){if(SUPABASE_KEY.startsWith("PEGAR_"))return false;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return true}
-function price(p){let d=profile?Number(profile.discount||0):Number(p.disc||0);return p.l*(1-d/100)}
+function productCategory(p){
+  let s=((p.d||"")+" "+((p.v||[]).join(" "))).toLowerCase();
+  if(s.includes("reten")) return "retenes";
+  if(s.includes("tensor") || s.includes("correa")) return "tensores";
+  return "rodamientos";
+}
+function discountFor(p){
+  let cat=productCategory(p);
+  if(profile){
+    if(cat==="retenes" && profile.discount_retenes!=null) return Number(profile.discount_retenes||0);
+    if(cat==="tensores" && profile.discount_tensores!=null) return Number(profile.discount_tensores||0);
+    if(cat==="rodamientos" && profile.discount_rodamientos!=null) return Number(profile.discount_rodamientos||0);
+    return Number(profile.discount||0);
+  }
+  return Number(p.disc||0);
+}
+function price(p){return p.l*(1-discountFor(p)/100)}
+function refreshDiscountLabels(){
+  let dr=profile?Number(profile.discount_rodamientos!=null?profile.discount_rodamientos:profile.discount||0):0;
+  let dt=profile?Number(profile.discount_tensores!=null?profile.discount_tensores:profile.discount||0):0;
+  let de=profile?Number(profile.discount_retenes!=null?profile.discount_retenes:profile.discount||0):0;
+  $("udisc").textContent=dr+"%";
+  $("udiscT").textContent=dt+"%";
+  $("udiscR").textContent=de+"%";
+}
 function show(a){
   current=a;
   let mk=+$("mk").value||0;
@@ -131,7 +155,7 @@ async function login(){
 
   // Mostrar nombre y descuento asignado por el administrador
   $("uname").textContent=profile.name||data.user.email;
-  $("udisc").textContent=Number(profile.discount||0)+"%";
+  refreshDiscountLabels();
 
   $("userbar").classList.remove("hidden");
 $("clientLoginBtn").classList.add("hidden");
@@ -454,8 +478,21 @@ async function adminOrders(){
   w.document.close();
 }
 async function status(id,s){let r=await sb.from("orders").update({status:s}).eq("id",id);if(r.error)alert(r.error.message);else adminOrders()}
-async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Descuento: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount||0)}" style="width:75px;padding:7px"> %</label> <button class="secondary" onclick="saveDiscount('${x.id}')">💾 Guardar</button><div id="discmsg_${x.id}" style="margin-top:6px"></div></div>`).join("")}
-async function saveDiscount(id){let input=$("disc_"+id),msgEl=$("discmsg_"+id),v=Number(input.value);if(!Number.isFinite(v)||v<0||v>100)return msgEl.textContent="Descuento inválido (0 a 100).";let r=await sb.from("profiles").update({discount:v}).eq("id",id);if(r.error){msgEl.textContent="No se pudo guardar: "+r.error.message;return}msgEl.textContent="✅ Guardado";}
+async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Rodamientos: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_rodamientos!=null?x.discount_rodamientos:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
+<label>Tensores: <input id="discT_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_tensores!=null?x.discount_tensores:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
+<label>Retenes: <input id="discR_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_retenes!=null?x.discount_retenes:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
+<button class="secondary" onclick="saveDiscount('${x.id}')">💾 Guardar descuentos</button><div id="discmsg_${x.id}" style="margin-top:6px"></div></div>`).join("")}
+async function saveDiscount(id){
+  let input=$("disc_"+id),inputT=$("discT_"+id),inputR=$("discR_"+id),msgEl=$("discmsg_"+id);
+  let dr=Number(input.value),dt=Number(inputT.value),de=Number(inputR.value);
+  if(![dr,dt,de].every(v=>Number.isFinite(v)&&v>=0&&v<=100)){
+    msgEl.textContent="Descuento inválido (0 a 100)."; return;
+  }
+  let r=await sb.from("profiles").update({
+    discount:dr,discount_rodamientos:dr,discount_tensores:dt,discount_retenes:de
+  }).eq("id",id);
+  msgEl.textContent=r.error?"No se pudo guardar: "+r.error.message:"✅ Guardado";
+}
 async function loadExcel(e){
   let f=e.target.files[0];
   if(!f)return;
@@ -573,7 +610,7 @@ async function restoreSession(){
   profile=r.data;
   admin=profile.role==="admin";
   $("uname").textContent=profile.name||u.email;
-  $("udisc").textContent=(profile.discount||0)+"%";
+  refreshDiscountLabels();
   $("userbar").classList.remove("hidden");
   showApp();
   show(current);
