@@ -54,9 +54,9 @@ function productCategory(p){
 function discountFor(p){
   let cat=productCategory(p);
   if(profile){
-    if(cat==="retenes" && profile.discount_retenes!=null) return Number(profile.discount_retenes||0);
-    if(cat==="tensores" && profile.discount_tensores!=null) return Number(profile.discount_tensores||0);
-    if(cat==="rodamientos" && profile.discount_rodamientos!=null) return Number(profile.discount_rodamientos||0);
+    if(cat==="retenes" && profile.discount_retenes!=null) return Number(profile.discount_retenes||40);
+    if(cat==="tensores" && profile.discount_tensores!=null) return Number(profile.discount_tensores||15);
+    if(cat==="rodamientos" && profile.discount_rodamientos!=null) return Number(profile.discount_rodamientos||15);
     return Number(profile.discount||0);
   }
   return Number(p.disc||0);
