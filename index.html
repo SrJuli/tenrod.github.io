@@ -280,6 +280,33 @@ let sb=null,profile=null,admin=false,cart=[],P=[
 {n:"84690",b:"SKF",e:"84690",d:"Rulemán de rueda",i:30,o:62,w:16,l:8996,disc:20,v:["Renault Clio","Chevrolet Corsa"],p:["Delantera"]}
 ],current=P;
 const $=id=>document.getElementById(id), money=x=>"$"+Math.round(x||0).toLocaleString("es-AR");
+  function sendContact(){
+
+  let email=$("contactEmail").value.trim();
+  let message=$("contactMessage").value.trim();
+
+  if(!email){
+    alert("Por favor ingresá tu email.");
+    return;
+  }
+
+  if(!message){
+    alert("Por favor escribí tu mensaje.");
+    return;
+  }
+
+  let subject=encodeURIComponent("Consulta desde TEN ROD");
+
+  let body=encodeURIComponent(
+    "Email del visitante: "+email+"\n\n"+
+    "Mensaje:\n"+message
+  );
+
+  window.location.href=
+    "mailto:juliangagliano@gmail.com"+
+    "?subject="+subject+
+    "&body="+body;
+}
 function ready(){if(SUPABASE_KEY.startsWith("PEGAR_"))return false;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return true}
 function productCategory(p){
   let s=((p.d||"")+" "+((p.v||[]).join(" "))).toLowerCase();
