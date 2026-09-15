@@ -390,7 +390,7 @@ body{margin:0;font-family:Arial;background:#f3f3f3;color:#222}header{background:
 style="width:200px; height:115px; object-fit:contain;"
   >
   <small>Rodamientos · Tensores de correa · Retenes</small>
-</div><div><button id="clientLoginBtn" class="btn" onclick="openBox('login')">👤 Ingresar</button><button class="btn" onclick="openBox('adminLogin')">🔐 Admin</button></div></div></header>
+</div><div><button id="clientLoginBtn" class="btn" onclick="openBox('login')">👤 Ingresar</button><button id="adminLoginBtn" class="btn" onclick="openBox('adminLogin')">🔐 Admin</button></div></div></header>
 <main class="wrap"><div class="banner">🟧 <b>TEN ROD v8</b> · Usuarios y pedidos con Supabase.</div>
 <div id="userbar" class="userbar hidden">👤 <b id="uname"></b> · Descuento: <b id="udisc">0%</b> · Tensores: <b id="udiscT">0%</b> · Retenes: <b id="udiscR">0%</b> <button class="secondary" onclick="myOrders()">📋 Mis pedidos</button> <button class="secondary" onclick="logout()">Salir</button></div>
 <section class="box"><h2>🔎 Buscar rodamiento</h2><input id="q" class="search" placeholder="Número, equivalencia, marca o aplicación..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
