@@ -586,7 +586,9 @@ async function login(){
   admin=false;
 
   $("uname").textContent=profile.name||data.user.email;
-  refreshDiscountLabels();
+$("welcomeName").textContent=profile.name||data.user.email;
+$("welcome").classList.remove("hidden");
+refreshDiscountLabels();
 
   $("userbar").classList.remove("hidden");
  if($("clientLoginBtn"))$("clientLoginBtn").classList.add("hidden");
