@@ -1103,7 +1103,8 @@ async function loadProducts(){
     v:String(p.vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),
     p:String(p.posicion||"").split(",").map(x=>x.trim()).filter(Boolean),
 stock:Number(p.stock||0),
-oferta:p.oferta===true
+oferta:p.oferta===true,
+    foto:String(p.foto||"").trim()
   }));
 
   build();
