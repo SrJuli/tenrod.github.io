@@ -393,7 +393,12 @@ style="width:200px; height:115px; object-fit:contain;"
 </div><div><button id="adminLoginBtn" class="btn hidden" onclick="openBox('adminLogin')">🔐 Admin</button></div></div></header>
 <main class="wrap"><div class="banner">🟧 <b>TEN ROD v8</b> · Usuarios y pedidos con Supabase.</div>
 <div id="userbar" class="userbar hidden">👤 <b id="uname"></b> · Descuento: <b id="udisc">0%</b> · Tensores: <b id="udiscT">0%</b> · Retenes: <b id="udiscR">0%</b> <button class="secondary" onclick="myOrders()">📋 Mis pedidos</button> <button class="secondary" onclick="logout()">Salir</button></div>
-<section class="box"><h2>🔎 Buscar rodamiento</h2><input id="q" class="search" placeholder="Número, equivalencia, marca o aplicación..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
+<div id="welcome" class="welcome hidden">
+  👋 <b>¡Bienvenido, <span id="welcomeName"></span>!</b>
+  <br>
+  <span>Ya podés consultar tu lista de precios.</span>
+</div>
+  <section class="box"><h2>🔎 Buscar rodamiento</h2><input id="q" class="search" placeholder="Número, equivalencia, marca o aplicación..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
 <div id="v" class="mode hidden"><div class="fields"><select id="brand" onchange="models()"><option>Marca</option></select><select id="model" onchange="vehicle()"><option>Modelo</option></select><select id="type" onchange="vehicle()"><option value="">Qué buscás</option></select><select id="pos" onchange="vehicle()"><option value="">Ubicación</option></select></div></div>
 <div id="m" class="mode hidden"><div class="fields"><input id="mi" placeholder="Interior mm"><input id="me" placeholder="Exterior mm"><input id="mw" placeholder="Ancho mm"><button onclick="measure()">Buscar</button></div></div></section>
 <div class="markup">💰 Recargo para venta: <input id="mk" type="number" value="30" min="0" oninput="show(current)"> %</div><h2>📦 Resultados <small id="count"></small></h2><div id="results" class="grid"></div></main>
