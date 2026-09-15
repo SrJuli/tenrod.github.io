@@ -1000,6 +1000,7 @@ oferta:String(r.Oferta||"").trim().toUpperCase()==="SI"
 posicion:(p.p||[]).join(", "),
 stock:p.stock,
 oferta:p.oferta
+        foto:p.foto
       }));
 
       let del=await sb.from("products").delete().neq("id",0);
