@@ -1129,9 +1129,13 @@ $("welcomeName").textContent=profile.name||u.email;
 $("welcome").classList.remove("hidden");
 refreshDiscountLabels();
 
-  $("userbar").classList.remove("hidden");
-  showApp();
-  show(current);
+ $("userbar").classList.remove("hidden");
+
+$("welcomeName").textContent=profile.name||u.email;
+$("welcome").classList.remove("hidden");
+
+showApp();
+show(current);
 }
   
 restoreSession();
