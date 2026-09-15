@@ -960,14 +960,23 @@ async function adminOrders(){
   w.document.close();
 }
 async function status(id,s){
-  let r=await sb.from("orders").update({status:s}).eq("id",id);
+  let r=await sb
+    .from("orders")
+    .update({status:s})
+    .eq("id",id)
+    .select("id,status");
 
   if(r.error){
-    alert("ERROR AL CAMBIAR ESTADO: "+r.error.message);
+    alert("ERROR: "+r.error.message);
     return;
   }
 
-  alert("Estado cambiado a: "+s);
+  if(!r.data || r.data.length===0){
+    alert("El estado no se pudo guardar. Supabase no modificó el pedido.");
+    return;
+  }
+
+  alert("Guardado: "+r.data[0].status);
   adminOrders();
 }
 async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Rodamientos: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_rodamientos!=null?x.discount_rodamientos:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
