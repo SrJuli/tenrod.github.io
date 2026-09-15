@@ -632,15 +632,16 @@ async function adminLogin(){
     return msg("amsg","Este usuario no es administrador.","err");
   }
 
-  admin=true;
-$("adminLoginBtn").classList.remove("hidden");
-$("adminLoginBtn").style.setProperty("display","inline-block","important");
+ admin=true;
 
 closeBox("adminLogin");
-  showApp();
-  openBox("admin");
-  adminOrders();
-}
+showApp();
+
+$("adminLoginBtn").classList.remove("hidden");
+$("adminLoginBtn").style.display="inline-block";
+
+openBox("admin");
+adminOrders();
   async function adminOrders(){
 
   let {data:orders,error}=await sb
