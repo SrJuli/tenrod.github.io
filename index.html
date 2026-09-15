@@ -600,12 +600,12 @@ async function logout(){
   update();
 
   $("userbar").classList.add("hidden");
-  $("clientLoginBtn").classList.remove("hidden");
 
   closeBox("admin");
-  $("adminLoginBtn").classList.remove("hidden");
   closeBox("orders");
   closeBox("cart");
+
+  $("adminLoginBtn").classList.add("hidden");
 
   $("app").style.display="none";
   $("landing").style.display="flex";
