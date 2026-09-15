@@ -582,9 +582,8 @@ async function login(){
   $("uname").textContent=profile.name||data.user.email;
   refreshDiscountLabels();
 
-  $("userbar").classList.remove("hidden");
+ $("userbar").classList.remove("hidden");
 $("clientLoginBtn").classList.add("hidden");
-  $("adminLoginBtn").classList.add("hidden");
 
 // Cerrar login y mostrar solamente el catálogo
 closeBox("login");
