@@ -1088,8 +1088,10 @@ async function restoreSession(){
   $("adminLoginBtn").classList.remove("hidden");
 }
 
-  $("uname").textContent=profile.name||u.email;
-  refreshDiscountLabels();
+ $("uname").textContent=profile.name||data.user.email;
+$("welcomeName").textContent=profile.name||data.user.email;
+$("welcome").classList.remove("hidden");
+refreshDiscountLabels();
 
   $("userbar").classList.remove("hidden");
   showApp();
