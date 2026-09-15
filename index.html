@@ -1128,8 +1128,8 @@ async function restoreSession(){
   $("adminLoginBtn").classList.remove("hidden");
 }
 
- $("uname").textContent=profile.name||data.user.email;
-$("welcomeName").textContent=profile.name||data.user.email;
+$("uname").textContent=profile.name||u.email;
+$("welcomeName").textContent=profile.name||u.email;
 $("welcome").classList.remove("hidden");
 refreshDiscountLabels();
 
