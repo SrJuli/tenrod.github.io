@@ -1061,6 +1061,11 @@ async function restoreSession(){
   if(r.error)return;
   profile=r.data;
   admin=profile.role==="admin";
+  if(admin){
+  $("adminLoginBtn").classList.remove("hidden");
+}else{
+  $("adminLoginBtn").classList.add("hidden");
+}
   $("uname").textContent=profile.name||u.email;
   refreshDiscountLabels();
   $("userbar").classList.remove("hidden");
