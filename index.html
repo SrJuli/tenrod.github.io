@@ -973,6 +973,7 @@ async function loadExcel(e){
         n:String(r.Numero||""),
         b:String(r.Marca||""),
         e:String(r.Equivalencia||""),
+         foto:String(r.Foto||"").trim(),
         d:String(r.Aplicacion||r.Descripcion||""),
         i:+r.Interior_mm||0,
         o:+r.Exterior_mm||0,
