@@ -1044,7 +1044,23 @@ function models(){
     modelos.map(x=>`<option>${x}</option>`).join("");
 
   vehicle();
-}function vehicle(){let b=$("brand").value,m=$("model").value,t=$("type").value,z=$("pos").value;show(P.filter(p=>(b=="Marca"||(p.v||[]).some(x=>make(x)==b))&&(m=="Modelo"||(p.v||[]).includes(m))&&(!t||p.d==t)&&(!z||(p.p||[]).includes(z))))}
+}
+  function vehicle(){
+  let b=$("brand").value;
+  let m=$("model").value;
+  let t=$("type").value;
+  let z=$("pos").value;
+
+  show(P.filter(p=>
+    (b=="Marca" || (p.v||[]).some(x=>make(x)==b)) &&
+    (m=="Modelo" || (p.v||[]).some(x=>
+      make(x)==b &&
+      String(x).trim().split(/\s+/).slice(1).join(" ")==m
+    )) &&
+    (!t || p.d==t) &&
+    (!z || (p.p||[]).includes(z))
+  ));
+}
 function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e)&&(!w||p.w==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){
   $(x).style.display="flex";
 
