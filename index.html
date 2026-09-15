@@ -639,6 +639,7 @@ async function adminLogin(){
   openBox("admin");
   adminOrders();
 }
+  async function adminOrders(){
 
   let {data:orders,error}=await sb
     .from("orders")
