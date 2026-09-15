@@ -583,7 +583,7 @@ async function login(){
   refreshDiscountLabels();
 
   $("userbar").classList.remove("hidden");
-  $("clientLoginBtn").classList.add("hidden");
+ if($("clientLoginBtn"))$("clientLoginBtn").classList.add("hidden");
   
 
   closeBox("login");
