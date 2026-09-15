@@ -510,6 +510,7 @@ function show(a){
 
     return `<article class="card">
       <h2>${p.n}</h2>
+      ${p.foto ? `<img src="fotos/${p.foto}" style="width:180px;height:180px;object-fit:contain;display:block;margin:10px auto;">` : ""}
     
       <div class="brand">${p.b}</div>
 ${p.oferta ? '<div style="font-weight:bold;margin:8px 0">🔥 OFERTA</div>' : ''}
