@@ -959,7 +959,17 @@ async function adminOrders(){
 
   w.document.close();
 }
-async function status(id,s){let r=await sb.from("orders").update({status:s}).eq("id",id);if(r.error)alert(r.error.message);else adminOrders()}
+async function status(id,s){
+  let r=await sb.from("orders").update({status:s}).eq("id",id);
+
+  if(r.error){
+    alert("ERROR AL CAMBIAR ESTADO: "+r.error.message);
+    return;
+  }
+
+  alert("Estado cambiado a: "+s);
+  adminOrders();
+}
 async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Rodamientos: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_rodamientos!=null?x.discount_rodamientos:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
 <label>Tensores: <input id="discT_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_tensores!=null?x.discount_tensores:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
 <label>Retenes: <input id="discR_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_retenes!=null?x.discount_retenes:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
