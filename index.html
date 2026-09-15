@@ -634,7 +634,7 @@ async function adminLogin(){
 
   admin=true;
 $("adminLoginBtn").classList.remove("hidden");
-$("adminLoginBtn").style.display="inline-block";
+$("adminLoginBtn").style.setProperty("display","inline-block","important");
 
 closeBox("adminLogin");
   showApp();
