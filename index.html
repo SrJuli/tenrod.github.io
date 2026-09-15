@@ -632,9 +632,10 @@ async function adminLogin(){
   }
 
   admin=true;
-  $("adminLoginBtn").classList.remove("hidden");
+$("adminLoginBtn").classList.remove("hidden");
+$("adminLoginBtn").style.display="inline-block";
 
-  closeBox("adminLogin");
+closeBox("adminLogin");
   showApp();
   openBox("admin");
   adminOrders();
