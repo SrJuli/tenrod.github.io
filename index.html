@@ -577,16 +577,16 @@ async function login(){
   if(r.error)return msg("lmsg","Usuario sin perfil en profiles.","err");
 
   profile=r.data;
+  admin=false;
 
-  // Mostrar nombre y descuento asignado por el administrador
   $("uname").textContent=profile.name||data.user.email;
   refreshDiscountLabels();
 
- $("userbar").classList.remove("hidden");
-$("clientLoginBtn").classList.add("hidden");
+  $("userbar").classList.remove("hidden");
+  $("clientLoginBtn").classList.add("hidden");
+  $("adminLoginBtn").classList.add("hidden");
 
-// Cerrar login y mostrar solamente el catálogo
-closeBox("login");
+  closeBox("login");
   showApp();
   show(current);
 }
