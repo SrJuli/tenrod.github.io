@@ -169,47 +169,50 @@ body{margin:0;font-family:Arial;background:#f3f3f3;color:#222}header{background:
 
     </div>
 
+
     <!-- MARCAS -->
-    <div class="brands-grid">
+    <div class="brands-banner">
 
-  <div class="brand-item">SKF</div>
-  <div class="brand-item">FAG</div>
-  <div class="brand-item">NSK</div>
-  <div class="brand-item">NTN</div>
-  <div class="brand-item">Koyo</div>
+      <div class="brands-title">
+        MARCAS QUE TRABAJAMOS
+      </div>
 
-  <div class="brand-item">NACHI</div>
-  <div class="brand-item">TIMKEN</div>
-  <div class="brand-item">INA</div>
-  <div class="brand-item">GMB</div>
-  <div class="brand-item">DAYCO</div>
+      <div class="brands-grid">
 
-  <div class="brand-item">
-    <img src="mar_240x240.png" alt="MAR">
-  </div>
+        <div class="brand-item">SKF</div>
+        <div class="brand-item">FAG</div>
+        <div class="brand-item">NSK</div>
+        <div class="brand-item">NTN</div>
+        <div class="brand-item">Koyo</div>
 
-  <div class="brand-item">
-    <img src="WJH-BEARINGS.jpg" alt="WJH">
-  </div>
+        <div class="brand-item">NACHI</div>
+        <div class="brand-item">TIMKEN</div>
+        <div class="brand-item">INA</div>
+        <div class="brand-item">GMB</div>
+        <div class="brand-item">DAYCO</div>
 
-  <div class="brand-item">
-    <img src="trezeguet.jpg" alt="Trezeguet">
-  </div>
+        <div class="brand-item">
+          <img src="mar_240x240.png" alt="MAR">
+        </div>
 
-  <div class="brand-item official">
-    <img src="Gemini_Generated_Image_giukaagiukaagiuk.jpg" alt="RDR">
-    <span>⭐ DISTRIBUIDOR OFICIAL</span>
-  </div>
+        <div class="brand-item">
+          <img src="WJH-BEARINGS.jpg" alt="WJH">
+        </div>
 
-  <div class="brand-item official">
-    <img src="foser.png" alt="Foster's">
-    <span>⭐ DISTRIBUIDOR OFICIAL</span>
-  </div>
-
-</div>
+        <div class="brand-item">
+          <img src="trezeguet.jpg" alt="Trezeguet">
+        </div>
 
         <div class="brand-item official">
-          Foster's
+          <img
+            src="Gemini_Generated_Image_giukaagiukaagiuk.jpg"
+            alt="RDR"
+          >
+          <span>⭐ DISTRIBUIDOR OFICIAL</span>
+        </div>
+
+        <div class="brand-item official">
+          <img src="foser.png" alt="Foster's">
           <span>⭐ DISTRIBUIDOR OFICIAL</span>
         </div>
 
@@ -217,42 +220,87 @@ body{margin:0;font-family:Arial;background:#f3f3f3;color:#222}header{background:
 
     </div>
 
+
+    <!-- QUÉ BUSCÁS -->
+    <div class="landing-info">
+
+      <div class="info-box">
+        <div class="info-icon">🔎</div>
+        <h3>¿QUÉ ESTÁS BUSCANDO?</h3>
+        <p>
+          Encontrá rápidamente rodamientos,
+          tensores de correa y retenes.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <div class="info-icon">🚚</div>
+        <h3>ENVÍOS A TODO EL PAÍS</h3>
+        <p>
+          Despachamos tus pedidos
+          a todo el país.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <div class="info-icon">📦</div>
+        <h3>STOCK Y DISPONIBILIDAD</h3>
+        <p>
+          Consultá disponibilidad
+          y stock actualizado.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <div class="info-icon">🏪</div>
+        <h3>ATENCIÓN A CASAS DE REPUESTOS</h3>
+        <p>
+          Atención personalizada
+          para casas de repuestos.
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- CONTACTO -->
+    <div class="contact-section">
+
+      <div class="contact-title">
+        📩 COMUNICATE CON NOSOTROS
+      </div>
+
+      <p class="contact-subtitle">
+        ¿Tenés alguna consulta? Escribinos.
+      </p>
+
+      <div class="contact-form">
+
+        <input
+          type="email"
+          id="contactEmail"
+          placeholder="Tu email"
+        >
+
+        <textarea
+          id="contactMessage"
+          placeholder="Escribí tu mensaje..."
+          rows="5"
+        ></textarea>
+
+        <button
+          class="btn contact-button"
+          onclick="sendContact()"
+        >
+          ✉️ ENVIAR MENSAJE
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
-<!-- CONTACTO -->
-<div class="contact-section">
 
-  <div class="contact-title">
-    📩 COMUNICATE CON NOSOTROS
-  </div>
-
-  <p class="contact-subtitle">
-    ¿Tenés alguna consulta? Escribinos.
-  </p>
-
-  <div class="contact-form">
-
-    <input
-      type="email"
-      id="contactEmail"
-      placeholder="Tu email"
-    >
-
-    <textarea
-      id="contactMessage"
-      placeholder="Escribí tu mensaje..."
-      rows="5"
-    ></textarea>
-
-    <button
-      class="btn contact-button"
-      onclick="sendContact()"
-    >
-      ✉️ ENVIAR MENSAJE
-    </button>
-
-  </div>
-
-</div>
 </section>
 <div id="app" style="display:none;">
 <header><div class="wrap top"><div><div class="logo">TEN ROD</div><small>Rodamientos · Tensores · Pedidos</small></div><div><button id="clientLoginBtn" class="btn" onclick="openBox('login')">👤 Ingresar</button><button class="btn" onclick="openBox('adminLogin')">🔐 Admin</button></div></div></header>
