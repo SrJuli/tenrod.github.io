@@ -538,6 +538,23 @@ ${p.oferta ? '<div style="font-weight:bold;margin:8px 0">🔥 OFERTA</div>' : ''
 
   $("count").textContent="("+a.length+")";
 }
+  function zoomFoto(src){
+  let fondo=document.createElement("div");
+  fondo.style.position="fixed";
+  fondo.style.inset="0";
+  fondo.style.background="#000c";
+  fondo.style.display="flex";
+  fondo.style.alignItems="center";
+  fondo.style.justifyContent="center";
+  fondo.style.zIndex="9999";
+  fondo.style.cursor="pointer";
+
+  fondo.innerHTML=`<img src="${src}" style="max-width:90vw;max-height:90vh;object-fit:contain;">`;
+
+  fondo.onclick=()=>fondo.remove();
+
+  document.body.appendChild(fondo);
+}
   function add(i){
   let p=current[i];
   let x=cart.find(x=>x.p.n===p.n && x.p.b===p.b);
