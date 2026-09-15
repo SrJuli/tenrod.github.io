@@ -634,12 +634,11 @@ async function adminLogin(){
 
  admin=true;
 
-closeBox("adminLogin");
-showApp();
-
 $("adminLoginBtn").classList.remove("hidden");
 $("adminLoginBtn").style.display="inline-block";
 
+closeBox("adminLogin");
+showApp();
 openBox("admin");
 adminOrders();
 }
