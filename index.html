@@ -604,6 +604,8 @@ async function login(){
 
   profile=r.data;
   admin=false;
+  cart=JSON.parse(localStorage.getItem("tenrod_cart_"+data.user.id)||"[]");
+update();
 
   $("uname").textContent=profile.name||data.user.email;
 $("welcomeName").textContent=profile.name||data.user.email;
