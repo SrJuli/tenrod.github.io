@@ -555,7 +555,7 @@ ${p.oferta ? '<div style="font-weight:bold;margin:8px 0">🔥 OFERTA</div>' : ''
 
   document.body.appendChild(fondo);
 }
-  function add(i){
+ function add(i){
   let p=current[i];
   let x=cart.find(x=>x.p.n===p.n && x.p.b===p.b);
 
@@ -565,10 +565,11 @@ ${p.oferta ? '<div style="font-weight:bold;margin:8px 0">🔥 OFERTA</div>' : ''
     cart.push({p:p,qty:1});
   }
 
+  localStorage.setItem("tenrod_cart",JSON.stringify(cart));
+
   update();
   alert("Producto agregado al carrito");
 }
-
 function update(){
   $("cc").textContent=cart.reduce((s,x)=>s+x.qty,0);
 }
