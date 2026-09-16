@@ -574,7 +574,41 @@ function update(){
  localStorage.setItem("tenrod_cart_"+profile.id,JSON.stringify(cart));
   $("cc").textContent=cart.reduce((s,x)=>s+x.qty,0);
 }
-function cartOpen(){let t=0;$("cartitems").innerHTML=cart.length?cart.map((x,i)=>{let z=price(x.p)*x.qty;t+=z;return `<div class="row"><b>${x.p.n} ${x.p.b}</b> × ${x.qty} — ${money(z)} <button onclick="changeQty(${i},-1)">−</button><button onclick="changeQty(${i},1)">+</button><button onclick="changeQty(${i},-99)">🗑️</button></div>`}).join(""):"Carrito vacío";$("carttotal").innerHTML=cart.length?`<h2>Total: ${money(t)}</h2>`:"";openBox("cart")}
+function cartOpen(){
+  let t=0;
+
+  $("cartitems").innerHTML=cart.length
+    ? cart.map((x,i)=>{
+        let unit=price(x.p);
+        let subtotal=unit*x.qty;
+        t+=subtotal;
+
+        return `
+          <div class="row" style="margin-bottom:12px;padding:12px;">
+            <div>
+              <b>${x.p.n} ${x.p.b}</b>
+              <br>
+              Precio unitario: ${money(unit)}
+              <br>
+              Cantidad:
+              <button onclick="changeQty(${i},-1)">−</button>
+              <b style="margin:0 8px">${x.qty}</b>
+              <button onclick="changeQty(${i},1)">+</button>
+              <button onclick="changeQty(${i},-99)" style="margin-left:8px;">🗑️</button>
+              <br>
+              Subtotal: <b>${money(subtotal)}</b>
+            </div>
+          </div>
+        `;
+      }).join("")
+    : "Carrito vacío";
+
+  $("carttotal").innerHTML=cart.length
+    ? `<h2 style="border-top:1px solid #ccc;padding-top:12px;">Total: ${money(t)}</h2>`
+    : "";
+
+  openBox("cart");
+}
 function changeQty(i,n){if(n===-99)cart.splice(i,1);else{cart[i].qty+=n;if(cart[i].qty<1)cart.splice(i,1)}update();cartOpen()}
 function showApp(){
   $("landing").style.display="none";
