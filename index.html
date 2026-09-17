@@ -795,8 +795,9 @@ async function adminOrders(){
     return;
   }
 
-  let cliente=o.profiles?.name||o.profiles?.email||"Sin cliente";
-  let email=o.profiles?.email||"";
+  let perfil=await sb.from("profiles").select("name,email").eq("id",o.user_id).single();
+let cliente=perfil.data?.name||perfil.data?.email||"Sin cliente";
+let email=perfil.data?.email||"";
 
   let items=(o.order_items||[]).map(x=>`
     <tr>
