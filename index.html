@@ -588,6 +588,8 @@ function cartOpen(){
             <div>
               <b>${x.p.n} ${x.p.b}</b>
               <br>
+              ${x.p.d ? `Aplicación: ${x.p.d}<br>` : ""}
+              ${x.p.v?.length ? `Vehículos: ${x.p.v.join(", ")}<br>` : ""}
               Precio unitario: ${money(unit)}
               <br>
               Cantidad:
