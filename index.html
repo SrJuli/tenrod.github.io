@@ -1184,7 +1184,10 @@ async function loadProducts(){
     w:Number(p.ancho_mm||0),
     l:Number(p.precio_lista||0),
     disc:Number(p.descuento||0),
-    v:String(p.vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),
+    descCantidad:Number(p.desc_cantidad||0),
+    cantMinima:Number(p.cant_minima||0),
+    
+   v:String(p.vehiculo||"").split(",").map(x=>x.trim()).filter(Boolean),
     p:String(p.posicion||"").split(",").map(x=>x.trim()).filter(Boolean),
 stock:Number(p.stock||0),
 oferta:p.oferta===true,
