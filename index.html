@@ -798,9 +798,9 @@ async function adminOrders(){
     return;
   }
 
- let cliente=o.profiles?.name||o.profiles?.email||"Sin cliente";
-let email=o.profiles?.email||"";
-
+ let cliente=o.cliente?.name||o.cliente?.email||"Sin cliente";
+let email=o.cliente?.email||"";
+    
   let items=(o.order_items||[]).map(x=>`
     <tr>
       <td>${x.number||""}</td>
