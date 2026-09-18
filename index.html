@@ -733,7 +733,10 @@ async function adminOrders(){
     clientes[p.id]=p;
   });
 
-  window.ADMIN_ORDERS=orders||[];
+  window.ADMIN_ORDERS=(orders||[]).map(o=>({
+  ...o,
+  cliente:clientes[o.user_id]||null
+}));
 
   $("admincontent").innerHTML=orders.length
     ? orders.map(o=>{
