@@ -1078,6 +1078,8 @@ oferta:String(r.Oferta||"").trim().toUpperCase()==="SI"
         ancho_mm:p.w,
         precio_lista:p.l,
         descuento:p.disc,
+        desc_cantidad:p.descCantidad,
+        cant_minima:p.cantMinima,
         vehiculo:(p.v||[]).join(", "),
 posicion:(p.p||[]).join(", "),
 stock:p.stock,
