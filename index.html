@@ -507,12 +507,16 @@ function priceQty(p,qty){
   return p.l*(1-descuento/100);
 }
   
-  function refreshDiscountLabels(){
-  let dr=profile?Number(profile.discount_rodamientos!=null?profile.discount_rodamientos:profile.discount||0):0;
-  let dt=profile?Number(profile.discount_tensores!=null?profile.discount_tensores:profile.discount||0):0;
-  let de=profile?Number(profile.discount_retenes!=null?profile.discount_retenes:profile.discount||0):0;
+ function refreshDiscountLabels(){
+  let dr=profile
+    ?Number(profile.discount!=null?profile.discount:15)
+    :0;
+
+  let de=profile
+    ?Number(profile.discount_retenes!=null?profile.discount_retenes:40)
+    :0;
+
   $("udisc").textContent=dr+"%";
-  $("udiscT").textContent=dt+"%";
   $("udiscR").textContent=de+"%";
 }
 function show(a){
