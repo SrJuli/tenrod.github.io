@@ -592,7 +592,7 @@ function cartOpen(){
 
   $("cartitems").innerHTML=cart.length
     ? cart.map((x,i)=>{
-        let unit=price(x.p);
+       let unit=priceQty(x.p,x.qty);
         let subtotal=unit*x.qty;
         t+=subtotal;
 
