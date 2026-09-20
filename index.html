@@ -1039,10 +1039,69 @@ async function status(id,s){
   alert("Guardado: "+r.data[0].status);
   adminOrders();
 }
-async function adminClients(){let r=await sb.from("profiles").select("*").order("name");if(r.error)return $("admincontent").textContent=r.error.message;$("admincontent").innerHTML=`<div class="row"><b>👥 Clientes</b><br><small>Modificá el descuento y guardalo. El cambio se aplica al próximo ingreso del cliente.</small></div>`+r.data.map(x=>`<div class="row"><b>${x.name||"(sin nombre)"}</b><br>${x.email||""}<br>Tipo: ${x.role||"client"}<br><label>Rodamientos: <input id="disc_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_rodamientos!=null?x.discount_rodamientos:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
-<label>Tensores: <input id="discT_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_tensores!=null?x.discount_tensores:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
-<label>Retenes: <input id="discR_${x.id}" type="number" min="0" max="100" step="1" value="${Number(x.discount_retenes!=null?x.discount_retenes:x.discount||0)}" style="width:60px;padding:7px"> %</label><br>
-<button class="secondary" onclick="saveDiscount('${x.id}')">💾 Guardar descuentos</button><div id="discmsg_${x.id}" style="margin-top:6px"></div></div>`).join("")}
+async function adminClients(){
+  let r=await sb
+    .from("profiles")
+    .select("*")
+    .order("name");
+
+  if(r.error)
+    return $("admincontent").textContent=r.error.message;
+
+  $("admincontent").innerHTML=
+    `<div class="row">
+      <b>👥 Clientes</b><br>
+      <small>
+        El descuento general se aplica a rodamientos y tensores.
+        Retenes tiene un descuento especial.
+      </small>
+    </div>`+
+    r.data.map(x=>`
+      <div class="row">
+        <b>${x.name||"(sin nombre)"}</b><br>
+        ${x.email||""}<br>
+        Tipo: ${x.role||"client"}<br>
+
+        <label>
+          Descuento general:
+          <input
+            id="disc_${x.id}"
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            value="${Number(x.discount!=null?x.discount:15)}"
+            style="width:60px;padding:7px"
+          >
+          %
+        </label>
+        <br>
+
+        <label>
+          Retenes:
+          <input
+            id="discR_${x.id}"
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            value="${Number(x.discount_retenes!=null?x.discount_retenes:40)}"
+            style="width:60px;padding:7px"
+          >
+          %
+        </label>
+        <br>
+
+        <button
+          class="secondary"
+          onclick="saveDiscount('${x.id}')">
+          💾 Guardar descuentos
+        </button>
+
+        <div id="discmsg_${x.id}" style="margin-top:6px"></div>
+      </div>
+    `).join("");
+}
 async function saveDiscount(id){
   let input=$("disc_"+id),inputT=$("discT_"+id),inputR=$("discR_"+id),msgEl=$("discmsg_"+id);
   let dr=Number(input.value),dt=Number(inputT.value),de=Number(inputR.value);
