@@ -1103,15 +1103,27 @@ async function adminClients(){
     `).join("");
 }
 async function saveDiscount(id){
-  let input=$("disc_"+id),inputT=$("discT_"+id),inputR=$("discR_"+id),msgEl=$("discmsg_"+id);
-  let dr=Number(input.value),dt=Number(inputT.value),de=Number(inputR.value);
-  if(![dr,dt,de].every(v=>Number.isFinite(v)&&v>=0&&v<=100)){
-    msgEl.textContent="Descuento inválido (0 a 100)."; return;
+  let input=$("disc_"+id);
+  let inputR=$("discR_"+id);
+  let msgEl=$("discmsg_"+id);
+
+  let dg=Number(input.value);
+  let de=Number(inputR.value);
+
+  if(![dg,de].every(v=>Number.isFinite(v)&&v>=0&&v<=100)){
+    msgEl.textContent="Descuento inválido (0 a 100).";
+    return;
   }
+
   let r=await sb.from("profiles").update({
-    discount:dr,discount_rodamientos:dr,discount_tensores:dt,discount_retenes:de
+    discount:dg,
+    discount_retenes:de
   }).eq("id",id);
-  msgEl.textContent=r.error?"No se pudo guardar: "+r.error.message:"✅ Guardado";
+
+  msgEl.textContent=
+    r.error
+      ?"No se pudo guardar: "+r.error.message
+      :"✅ Guardado";
 }
 async function loadExcel(e){
   let f=e.target.files[0];
