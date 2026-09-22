@@ -414,7 +414,46 @@ style="width:200px; height:115px; object-fit:contain;"
   <button class="secondary" onclick="openBox('newClient')">➕ Nuevo cliente</button>
   <button class="secondary" onclick="document.getElementById('excel').click()">📊 Excel</button>
 </div><div id="admincontent"></div><input id="excel" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadExcel(event)"></div></div>
+<div id="newClient" class="overlay">
+  <div class="panel">
 
+    <button class="close" onclick="closeBox('newClient')">×</button>
+
+    <h2>➕ Nuevo cliente</h2>
+
+    <label>Nombre</label>
+    <input id="newClientName" placeholder="Nombre del cliente">
+
+    <br><br>
+
+    <label>Email</label>
+    <input id="newClientEmail" type="email" placeholder="email@cliente.com">
+
+    <br><br>
+
+    <label>Contraseña</label>
+    <input id="newClientPass" type="password" placeholder="Contraseña inicial">
+
+    <br><br>
+
+    <label>Descuento general</label>
+    <input id="newClientDiscount" type="number" min="0" max="100" value="15">
+
+    <br><br>
+
+    <label>Descuento retenes</label>
+    <input id="newClientRetenes" type="number" min="0" max="100" value="35">
+
+    <br><br>
+
+    <button class="btn" onclick="createClient()">
+      ➕ Crear cliente
+    </button>
+
+    <div id="newClientMsg" class="status"></div>
+
+  </div>
+</div>
 <script>
   function sendContact(){
 
