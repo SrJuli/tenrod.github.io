@@ -408,7 +408,12 @@ style="width:200px; height:115px; object-fit:contain;"
 <div id="adminLogin" class="overlay"><div class="panel"><button class="close" onclick="closeBox('adminLogin')">×</button><h2>🔐 Administrador</h2><input id="aemail" placeholder="Email" style="padding:11px;width:100%;box-sizing:border-box"><br><br><input id="apass" type="password" placeholder="Contraseña" style="padding:11px;width:100%;box-sizing:border-box"><br><br><button class="btn" onclick="adminLogin()">Ingresar</button><div id="amsg" class="status"></div></div></div>
 <div id="cart" class="overlay"><div class="panel"><button class="close" onclick="closeBox('cart')">×</button><h2>🛒 Mi pedido</h2><div id="cartitems"></div><div id="carttotal"></div><button class="send" onclick="sendOrder()">📤 Confirmar pedido</button></div></div>
 <div id="orders" class="overlay"><div class="panel"><button class="close" onclick="closeBox('orders')">×</button><h2>📋 Mis pedidos</h2><div id="orderslist"></div></div></div>
-<div id="admin" class="overlay"><div class="panel"><button class="close" onclick="closeBox('admin')">×</button><h2>🔐 Panel administrador</h2><div class="actions"><button class="secondary" onclick="adminOrders()">📦 Pedidos</button><button class="secondary" onclick="adminClients()">👥 Clientes</button><button class="secondary" onclick="document.getElementById('excel').click()">📊 Excel</button></div><div id="admincontent"></div><input id="excel" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadExcel(event)"></div></div>
+<div id="admin" class="overlay"><div class="panel"><button class="close" onclick="closeBox('admin')">×</button><h2>🔐 Panel administrador</h2><div class="actions">
+  <button class="secondary" onclick="adminOrders()">📦 Pedidos</button>
+  <button class="secondary" onclick="adminClients()">👥 Clientes</button>
+  <button class="secondary" onclick="openBox('newClient')">➕ Nuevo cliente</button>
+  <button class="secondary" onclick="document.getElementById('excel').click()">📊 Excel</button>
+</div><div id="admincontent"></div><input id="excel" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadExcel(event)"></div></div>
 
 <script>
   function sendContact(){
