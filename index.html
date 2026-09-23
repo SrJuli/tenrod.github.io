@@ -1169,7 +1169,99 @@ async function saveDiscount(id){
       ?"No se pudo guardar: "+r.error.message
       :"✅ Guardado";
 }
-async function loadExcel(e){
+async function createClient(){
+
+  let name = $("newClientName").value.trim();
+  let email = $("newClientEmail").value.trim();
+  let password = $("newClientPass").value;
+
+  let discount = Number($("newClientDiscount").value);
+  let discountRetenes = Number($("newClientRetenes").value);
+
+  let msg = $("newClientMsg");
+
+  msg.textContent = "";
+
+  if(!name || !email || !password){
+    msg.textContent = "Completá nombre, email y contraseña.";
+    return;
+  }
+
+  if(password.length < 6){
+    msg.textContent = "La contraseña debe tener al menos 6 caracteres.";
+    return;
+  }
+
+  if(
+    !Number.isFinite(discount) ||
+    discount < 0 ||
+    discount > 100 ||
+    !Number.isFinite(discountRetenes) ||
+    discountRetenes < 0 ||
+    discountRetenes > 100
+  ){
+    msg.textContent = "Los descuentos deben estar entre 0 y 100.";
+    return;
+  }
+
+  msg.textContent = "Creando cliente...";
+
+  try{
+
+    let session = await sb.auth.getSession();
+
+    let token = session.data.session?.access_token;
+
+    if(!token){
+      msg.textContent = "No hay una sesión de administrador activa.";
+      return;
+    }
+
+    let r = await fetch(
+      "https://fwqvwdjxjpfnupzqqzbf.supabase.co/functions/v1/create-client",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer "+token
+        },
+
+        body:JSON.stringify({
+          name:name,
+          email:email,
+          password:password,
+          discount:discount,
+          discount_retenes:discountRetenes
+        })
+      }
+    );
+
+    let data = await r.json();
+
+    if(!r.ok){
+      msg.textContent =
+        "❌ "+(data.error || "No se pudo crear el cliente.");
+      return;
+    }
+
+    msg.textContent = "✅ Cliente creado correctamente.";
+
+    $("newClientName").value = "";
+    $("newClientEmail").value = "";
+    $("newClientPass").value = "";
+
+    await adminClients();
+
+  }catch(error){
+
+    msg.textContent =
+      "❌ Error: "+error.message;
+
+  }
+}
+
+  async function loadExcel(e){
   let f=e.target.files[0];
   if(!f)return;
 
