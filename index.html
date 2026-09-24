@@ -1143,6 +1143,15 @@ async function adminClients(){
 </button>
 
 <br>
+<br>
+
+<button
+  class="secondary"
+  onclick="changeClientPassword('${x.id}')">
+  🔑 Cambiar contraseña
+</button>
+
+<div id="passmsg_${x.id}" style="margin-top:6px"></div>
 
 <button
   class="secondary"
