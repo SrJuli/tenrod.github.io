@@ -1137,10 +1137,21 @@ async function adminClients(){
         <br>
 
         <button
-          class="secondary"
-          onclick="saveDiscount('${x.id}')">
-          💾 Guardar descuentos
-        </button>
+  class="secondary"
+  onclick="saveDiscount('${x.id}')">
+  💾 Guardar descuentos
+</button>
+
+<br>
+
+<button
+  class="secondary"
+  onclick="changeClientPassword('${x.id}')">
+  🔑 Cambiar contraseña
+</button>
+
+<div id="discmsg_${x.id}" style="margin-top:6px"></div>
+<div id="passmsg_${x.id}" style="margin-top:6px"></div>
 
         <div id="discmsg_${x.id}" style="margin-top:6px"></div>
       </div>
