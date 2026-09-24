@@ -1271,7 +1271,68 @@ async function createClient(){
 
   }
 }
+async function changeClientPassword(id){
 
+  let nueva = prompt("Escribí la nueva contraseña:");
+
+  if(nueva === null) return;
+
+  nueva = nueva.trim();
+
+  if(nueva.length < 6){
+    alert("La contraseña debe tener al menos 6 caracteres.");
+    return;
+  }
+
+  let msg = $("passmsg_"+id);
+
+  msg.textContent = "Cambiando contraseña...";
+
+  try{
+
+    let session = await sb.auth.getSession();
+
+    let token = session.data.session?.access_token;
+
+    if(!token){
+      msg.textContent = "❌ No hay una sesión de administrador activa.";
+      return;
+    }
+
+    let r = await fetch(
+      "https://fwqvwdjxjpfnupzqqzbf.supabase.co/functions/v1/change-client-password",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer "+token
+        },
+
+        body:JSON.stringify({
+          user_id:id,
+          password:nueva
+        })
+      }
+    );
+
+    let data = await r.json();
+
+    if(!r.ok){
+      msg.textContent =
+        "❌ "+(data.error || "No se pudo cambiar la contraseña.");
+      return;
+    }
+
+    msg.textContent = "✅ Contraseña cambiada correctamente.";
+
+  }catch(error){
+
+    msg.textContent =
+      "❌ Error: "+error.message;
+
+  }
+}
   async function loadExcel(e){
   let f=e.target.files[0];
   if(!f)return;
