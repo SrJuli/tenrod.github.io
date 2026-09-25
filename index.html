@@ -520,10 +520,12 @@ const $=id=>document.getElementById(id), money=x=>"$"+Math.round(x||0).toLocaleS
 }
 function ready(){if(SUPABASE_KEY.startsWith("PEGAR_"))return false;sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);return true}
 function productCategory(p){
-  let s=((p.d||"")+" "+((p.v||[]).join(" "))).toLowerCase();
-  if(s.includes("reten")) return "retenes";
-  if(s.includes("tensor") || s.includes("correa")) return "tensores";
-  return "rodamientos";
+  let marca = String(p.b || "").trim().toLowerCase();
+
+  if(marca === "trezeguet")
+    return "retenes";
+
+  return "general";
 }
 function discountFor(p){
   let cat=productCategory(p);
