@@ -490,7 +490,7 @@ let sb=null,profile=null,admin=false,cart=[],P=[
 {n:"12025",b:"SKF",e:"12025-2RS",d:"Rulemán de rueda",i:25,o:52,w:15,l:18500,disc:20,v:["Renault Clio"],p:["Delantera"]},
 {n:"84690",b:"SKF",e:"84690",d:"Rulemán de rueda",i:30,o:62,w:16,l:8996,disc:20,v:["Renault Clio","Chevrolet Corsa"],p:["Delantera"]}
 ],current=P;
-const $=id=>document.getElementById(id), money=x=>"$"+Math.round(x||0).toLocaleString("es-AR");
+const $=id=>document.getElementById(id), money=x=>"$"+Number(x||0).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
   function sendContact(){
 
   let email=$("contactEmail").value.trim();
