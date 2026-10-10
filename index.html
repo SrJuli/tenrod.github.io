@@ -580,6 +580,15 @@ function priceQty(p,qty){
   $("udisc").textContent=dr+"%";
   $("udiscR").textContent=de+"%";
 }
+function displayMeasure(p){
+  if(p.medida) return p.medida;
+  let medida=String(p.i||"");
+  if(p.o) medida+=(medida?"x":"")+p.o;
+  if(p.o2) medida+="/"+p.o2;
+  if(p.w) medida+=(medida?"x":"")+p.w;
+  if(p.w2) medida+="/"+p.w2;
+  return medida ? medida+" mm" : "Sin medidas cargadas";
+}
 function show(a){
   current=a;
   let mk=+$("mk").value||0;
@@ -597,7 +606,7 @@ ${p.oferta ? '<div style="font-weight:bold;margin:8px 0">🔥 OFERTA</div>' : ''
       <p>
         Equivalencia: ${p.e}<br>
         ${p.d}<br>
-        Medidas: ${p.i} × ${p.o} × ${p.w} mm<br>
+        Medidas: ${displayMeasure(p)}<br>
         Vehículos: ${(p.v||[]).join(", ")}
       </p>
 
@@ -1379,7 +1388,10 @@ async function changeClientPassword(id){
         d:String(r.Aplicacion||r.Descripcion||""),
         i:+r.Interior_mm||0,
         o:+r.Exterior_mm||0,
+        o2:+r.Exterior2_mm||0,
         w:+r.Ancho_mm||0,
+        w2:+r.Ancho2_mm||0,
+        medida:String(r.Medida||"").trim(),
         l:+r.Precio_Lista||0,
         disc:+r["Descuento_%"]||0,
         descCantidad:+r["Desc_Cantidad_%"]||0,
@@ -1399,7 +1411,10 @@ oferta:String(r.Oferta||"").trim().toUpperCase()==="SI"
         aplicacion:p.d,
         interior_mm:p.i,
         exterior_mm:p.o,
+        exterior2_mm:p.o2,
         ancho_mm:p.w,
+        ancho2_mm:p.w2,
+        medida:p.medida || displayMeasure(p),
         precio_lista:p.l,
         descuento:p.disc,
         desc_cantidad:p.descCantidad,
@@ -1474,7 +1489,7 @@ function models(){
     (!z || (p.p||[]).includes(z))
   ));
 }
-function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e)&&(!w||p.w==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){
+function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e||p.o2==e)&&(!w||p.w==w||p.w2==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){
   $(x).style.display="flex";
 
   if(x==="admin"){
@@ -1505,7 +1520,10 @@ async function loadProducts(){
     d:String(p.aplicacion||""),
     i:Number(p.interior_mm||0),
     o:Number(p.exterior_mm||0),
+    o2:Number(p.exterior2_mm||0),
     w:Number(p.ancho_mm||0),
+    w2:Number(p.ancho2_mm||0),
+    medida:String(p.medida||"").trim(),
     l:Number(p.precio_lista||0),
     disc:Number(p.descuento||0),
     descCantidad:Number(p.desc_cantidad||0),
