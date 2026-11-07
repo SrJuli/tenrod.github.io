@@ -1502,6 +1502,30 @@ function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.fi
 function closeBox(x){
   $(x).style.display="none";
 }function msg(id,t,c){$(id).textContent=t;$(id).className="status "+c}
+  async function loadCatalogUpdate(){
+  const el = document.getElementById("catalogUpdated");
+  if (!el || !sb) return;
+
+  const { data, error } = await sb
+    .from("catalog_updates")
+    .select("updated_at")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (error) {
+    el.textContent = "No se pudo consultar la fecha de actualización.";
+    console.error(error);
+    return;
+  }
+
+  if (data?.updated_at) {
+    const fecha = new Date(data.updated_at);
+    el.textContent = "Lista de precios actualizada por última vez: " +
+      fecha.toLocaleDateString("es-AR");
+  } else {
+    el.textContent = "Todavía no hay una fecha de actualización registrada.";
+  }
+}
 async function loadProducts(){
   if(!ready())return;
 
