@@ -413,7 +413,9 @@ style="width:200px; height:115px; object-fit:contain;"
   <br>
   <span>Ya podés consultar tu lista de precios.</span>
 </div>
-  <section class="box"><h2>🔎 Buscar rodamiento</h2><input id="q" class="search" placeholder="Número, equivalencia, marca o aplicación..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
+  <section class="box"><h2>🔎 Buscar rodamiento</h2>  <div id="catalogUpdated" style="font-size:12px;color:#888;margin:6px 0 12px;">
+  Consultando fecha de actualización...
+</div> <input id="q" class="search" placeholder="Número, equivalencia, marca o aplicación..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
 <div id="v" class="mode hidden"><div class="fields"><select id="brand" onchange="models()"><option>Marca</option></select><select id="model" onchange="vehicle()"><option>Modelo</option></select><select id="type" onchange="vehicle()"><option value="">Qué buscás</option></select><select id="pos" onchange="vehicle()"><option value="">Ubicación</option></select></div></div>
 <div id="m" class="mode hidden"><div class="fields"><input id="mi" placeholder="Interior mm"><input id="me" placeholder="Exterior mm"><input id="mw" placeholder="Ancho mm"><button onclick="measure()">Buscar</button></div></div></section>
 <div class="markup">💰 Recargo para venta: <input id="mk" type="number" value="30" min="0" oninput="show(current)"> %</div><h2>📦 Resultados <small id="count"></small></h2><div id="results" class="grid"></div></main>
