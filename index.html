@@ -1561,23 +1561,8 @@ stock:Number(p.stock||0),
 oferta:p.oferta===true,
     foto:String(p.foto||"").trim()
   }));
-const fechaImportacion = new Date().toISOString();
-
-const marcaFecha = await sb
-  .from("catalog_updates")
-  .upsert(
-    { id: 1, updated_at: fechaImportacion },
-    { onConflict: "id" }
-  );
-
 build();
 show(P);
-await loadCatalogUpdate();
-
-if (marcaFecha.error) {
-  alert("Excel cargado, pero no se pudo actualizar la fecha: " + marcaFecha.error.message);
-} else {
-  alert("Excel cargado correctamente: " + P.length + " productos");
 }
 }
 
