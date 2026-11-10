@@ -1497,10 +1497,25 @@ oferta:p.oferta,
         return;
       }
 
+     
       build();
       show(P);
 
-      alert("Excel cargado correctamente: "+P.length+" productos");
+      // Actualizar fecha de lista en Supabase
+      const { error: fechaError } = await sb
+        .from("catalog_updates")
+        .upsert({
+          id: 1,
+          updated_at: new Date().toISOString()
+        }, { onConflict: "id" });
+
+      if (fechaError) {
+        console.error("Error actualizando fecha:", fechaError);
+        alert("Productos cargados, pero no se pudo actualizar la fecha: " + fechaError.message);
+      } else {
+        await loadCatalogUpdate();
+        alert("Excel cargado correctamente: " + P.length + " productos");
+      }
 
     }catch(err){
       alert("Error al cargar Excel: "+err.message);
