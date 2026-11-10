@@ -632,6 +632,56 @@ ${p.oferta ? '<div style="font-weight:bold;margin:8px 0">🔥 OFERTA</div>' : ''
 
   $("count").textContent="("+a.length+")";
 }
+function verDescripcion(i){
+  let p=current[i];
+  if(!p || !p.descripcion)return;
+
+  let fondo=document.createElement("div");
+  fondo.style.position="fixed";
+  fondo.style.inset="0";
+  fondo.style.background="#000b";
+  fondo.style.display="flex";
+  fondo.style.alignItems="center";
+  fondo.style.justifyContent="center";
+  fondo.style.zIndex="10000";
+  fondo.style.padding="15px";
+
+  let ventana=document.createElement("div");
+  ventana.style.background="#fff";
+  ventana.style.color="#222";
+  ventana.style.padding="22px";
+  ventana.style.borderRadius="12px";
+  ventana.style.width="100%";
+  ventana.style.maxWidth="450px";
+  ventana.style.maxHeight="80vh";
+  ventana.style.overflowY="auto";
+
+  let titulo=document.createElement("h3");
+  titulo.textContent="🚗 Vehículos compatibles";
+
+  let texto=document.createElement("p");
+  texto.textContent=p.descripcion;
+  texto.style.whiteSpace="pre-line";
+  texto.style.lineHeight="1.6";
+
+  let boton=document.createElement("button");
+  boton.textContent="Cerrar";
+  boton.style.background="#f58220";
+  boton.style.color="#fff";
+  boton.style.border="0";
+  boton.style.padding="10px 22px";
+  boton.style.borderRadius="7px";
+  boton.style.cursor="pointer";
+  boton.onclick=()=>fondo.remove();
+
+  ventana.append(titulo,texto,boton);
+  fondo.appendChild(ventana);
+
+  fondo.onclick=()=>fondo.remove();
+  ventana.onclick=e=>e.stopPropagation();
+
+  document.body.appendChild(fondo);
+}
   function zoomFoto(src){
   let fondo=document.createElement("div");
   fondo.style.position="fixed";
