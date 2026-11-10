@@ -600,7 +600,10 @@ function show(a){
     let semaforo=stock>=5?"🟢":stock>=1?"🟡":"🔴";
 
     return `<article class="card">
-      <h2>${p.n}</h2>
+     <h2>
+  ${p.n}
+  ${p.descripcion ? `<button onclick="verDescripcion(${i})" title="Ver vehículos compatibles" style="border:0;background:none;cursor:pointer;font-size:20px;">🚗</button>` : ""}
+</h2>
      ${p.foto ? `<img src="fotos/${p.foto}" onclick="zoomFoto(this.src)" style="width:180px;height:180px;object-fit:contain;display:block;margin:10px auto;cursor:pointer;">` : ""}
     
       <div class="brand">${p.b}</div>
