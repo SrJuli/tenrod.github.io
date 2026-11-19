@@ -1439,7 +1439,7 @@ async function changeClientPassword(id){
         b:String(r.Marca||""),
         e:String(r.Equivalencia||""),
          foto:String(r.Foto||"").trim(),
-        d:String(r.Aplicacion||r.Descripcion||""),
+        d:String(r.Aplicacion||""),
         descripcion:String(r.Descripcion||"").trim(),
         i:+r.Interior_mm||0,
         o:+r.Exterior_mm||0,
