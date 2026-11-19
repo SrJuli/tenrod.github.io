@@ -415,7 +415,7 @@ style="width:200px; height:115px; object-fit:contain;"
 </div>
   <section class="box"><h2>🔎 Buscar rodamiento</h2>  <div id="catalogUpdated" style="font-size:12px;color:#888;margin:6px 0 12px;">
   Consultando fecha de actualización...
-</div> <input id="q" class="search" placeholder="Número, equivalencia, marca o aplicación..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
+</div> <input id="q" class="search" placeholder="Número, equivalencia, marca, aplicación, descripción o vehículo..." oninput="quick()"><div class="actions"><button onclick="mode('v')">🚗 Buscar por vehículo</button><button onclick="mode('m')">📏 Buscar por medidas</button></div>
 <div id="v" class="mode hidden"><div class="fields"><select id="brand" onchange="models()"><option>Marca</option></select><select id="model" onchange="vehicle()"><option>Modelo</option></select><select id="type" onchange="vehicle()" style="max-width:160px;"><option value="">Qué buscás</option></select><select id="pos" onchange="vehicle()"><option value="">Ubicación</option></select></div></div>
 <div id="m" class="mode hidden"><div class="fields"><input id="mi" placeholder="Interior mm"><input id="me" placeholder="Exterior mm"><input id="mw" placeholder="Ancho mm"><button onclick="measure()">Buscar</button></div></div></section>
 <div class="markup">💰 Recargo para venta: <input id="mk" type="number" value="30" min="0" oninput="show(current)"> %</div><h2>📦 Resultados <small id="count"></small></h2><div id="results" class="grid"></div></main>
@@ -1524,44 +1524,121 @@ oferta:p.oferta,
 
   r.readAsArrayBuffer(f);
 }
-function build(){let bs=[...new Set(P.flatMap(p=>p.v||[]).map(make))],ts=[...new Set(P.map(p=>p.d))],ps=[...new Set(P.flatMap(p=>p.p||[]))];$("brand").innerHTML="<option>Marca</option>"+bs.map(x=>`<option>${x}</option>`).join("");$("type").innerHTML='<option value="">Qué buscás</option>'+ts.map(x=>`<option>${x}</option>`).join("");$("pos").innerHTML='<option value="">Ubicación</option>'+ps.map(x=>`<option>${x}</option>`).join("")}
+function normalizarBusqueda(valor){
+  return String(valor ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .replace(/[^a-z0-9.,x/]+/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function build(){
+  const bs=[...new Set(P.flatMap(p=>p.v||[]).map(make).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,"es"));
+  const ts=[...new Set(P.map(p=>String(p.d||"").trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,"es"));
+  const ps=[...new Set(P.flatMap(p=>p.p||[]).map(x=>String(x).trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,"es"));
+
+  $("brand").innerHTML='<option value="Marca">Marca</option>'+
+    bs.map(x=>`<option value="${x}">${x}</option>`).join("");
+  $("model").innerHTML='<option value="Modelo">Modelo</option>';
+  $("type").innerHTML='<option value="">Qué buscás</option>'+
+    ts.map(x=>`<option value="${x}">${x}</option>`).join("");
+  $("pos").innerHTML='<option value="">Ubicación</option>'+
+    ps.map(x=>`<option value="${x}">${x}</option>`).join("");
+}
+
 function make(x){
-  return String(x).trim().split(/\s+/)[0];
+  return String(x||"").trim().split(/\s+/)[0]||"";
+}
+
+function modeloDeVehiculo(x){
+  return String(x||"").trim().split(/\s+/).slice(1).join(" ");
 }
 
 function models(){
-  let b=$("brand").value;
-
-  let modelos=[...new Set(
+  const b=normalizarBusqueda($("brand").value);
+  const modelos=[...new Set(
     P.flatMap(p=>p.v||[])
-      .filter(x=>make(x)==b)
-      .map(x=>String(x).trim().split(/\s+/).slice(1).join(" "))
+      .filter(x=>normalizarBusqueda(make(x))===b)
+      .map(modeloDeVehiculo)
       .filter(Boolean)
-  )];
+  )].sort((a,b)=>a.localeCompare(b,"es"));
 
-  $("model").innerHTML=
-    "<option>Modelo</option>"+
-    modelos.map(x=>`<option>${x}</option>`).join("");
-
+  $("model").innerHTML='<option value="Modelo">Modelo</option>'+
+    modelos.map(x=>`<option value="${x}">${x}</option>`).join("");
   vehicle();
 }
-  function vehicle(){
-  let b=$("brand").value;
-  let m=$("model").value;
-  let t=$("type").value;
-  let z=$("pos").value;
 
+function vehicle(){
+  const b=normalizarBusqueda($("brand").value);
+  const m=normalizarBusqueda($("model").value);
+  const t=normalizarBusqueda($("type").value);
+  const z=normalizarBusqueda($("pos").value);
+
+  show(P.filter(p=>{
+    const vehiculos=(p.v||[]).map(x=>({
+      marca:normalizarBusqueda(make(x)),
+      modelo:normalizarBusqueda(modeloDeVehiculo(x))
+    }));
+    return (!b || b==="marca" || vehiculos.some(x=>x.marca===b)) &&
+      (!m || m==="modelo" || vehiculos.some(x=>x.marca===b && x.modelo===m)) &&
+      (!t || normalizarBusqueda(p.d)===t) &&
+      (!z || (p.p||[]).some(x=>normalizarBusqueda(x)===z));
+  }));
+}
+
+function numeroMedida(valor){
+  if(valor===null || valor===undefined || String(valor).trim()==="") return null;
+  const n=Number(String(valor).trim().replace(",","."));
+  return Number.isFinite(n)?n:null;
+}
+
+function coincideMedida(valorBuscado, ...valoresProducto){
+  const buscado=numeroMedida(valorBuscado);
+  if(buscado===null) return true;
+  return valoresProducto.some(v=>{
+    const n=numeroMedida(v);
+    return n!==null && Math.abs(n-buscado)<0.001;
+  });
+}
+
+function measure(){
+  const a=$("mi").value, e=$("me").value, w=$("mw").value;
+  if(!a && !e && !w){
+    alert("Ingresá al menos una medida para buscar.");
+    return;
+  }
   show(P.filter(p=>
-    (b=="Marca" || (p.v||[]).some(x=>make(x)==b)) &&
-    (m=="Modelo" || (p.v||[]).some(x=>
-      make(x)==b &&
-      String(x).trim().split(/\s+/).slice(1).join(" ")==m
-    )) &&
-    (!t || p.d==t) &&
-    (!z || (p.p||[]).includes(z))
+    coincideMedida(a,p.i) &&
+    coincideMedida(e,p.o,p.o2) &&
+    coincideMedida(w,p.w,p.w2)
   ));
 }
-function measure(){let a=$("mi").value,e=$("me").value,w=$("mw").value;show(P.filter(p=>(!a||p.i==a)&&(!e||p.o==e||p.o2==e)&&(!w||p.w==w||p.w2==w)))}function quick(){let q=$("q").value.toLowerCase();show(q?P.filter(p=>(p.n+" "+p.b+" "+p.e+" "+p.d+" "+(p.v||[]).join(" ")).toLowerCase().includes(q)):P)}function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){
+
+function quick(){
+  const q=normalizarBusqueda($("q").value);
+  if(!q){
+    show(P);
+    return;
+  }
+
+  const terminos=q.split(" ").filter(Boolean);
+  show(P.filter(p=>{
+    const texto=normalizarBusqueda([
+      p.n,p.b,p.e,p.d,p.descripcion,
+      (p.v||[]).join(" "),
+      (p.p||[]).join(" "),
+      p.medida,p.i,p.o,p.o2,p.w,p.w2,
+      displayMeasure(p)
+    ].join(" "));
+    return terminos.every(t=>texto.includes(t));
+  }));
+}
+function mode(x){$("v").classList.toggle("hidden",x!="v");$("m").classList.toggle("hidden",x!="m")}function openBox(x){
   $(x).style.display="flex";
 
   if(x==="admin"){
