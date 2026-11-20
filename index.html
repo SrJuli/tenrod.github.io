@@ -1576,6 +1576,26 @@ function vehicle(){
   const b=normalizarBusqueda($("brand").value);
   const m=normalizarBusqueda($("model").value);
   const t=normalizarBusqueda($("type").value);
+
+  const ubicacionActual=$("pos").value;
+
+  const productosTipo=P.filter(p=>
+    !t || normalizarBusqueda(p.d)===t
+  );
+
+  const posiciones=[...new Set(
+    productosTipo.flatMap(p=>p.p||[])
+      .map(x=>String(x).trim())
+      .filter(Boolean)
+  )].sort((a,b)=>a.localeCompare(b,"es"));
+
+  $("pos").innerHTML='<option value="">Ubicación</option>'+
+    posiciones.map(x=>`<option value="${x}">${x}</option>`).join("");
+
+  if(posiciones.includes(ubicacionActual)){
+    $("pos").value=ubicacionActual;
+  }
+
   const z=normalizarBusqueda($("pos").value);
 
   show(P.filter(p=>{
@@ -1583,6 +1603,7 @@ function vehicle(){
       marca:normalizarBusqueda(make(x)),
       modelo:normalizarBusqueda(modeloDeVehiculo(x))
     }));
+
     return (!b || b==="marca" || vehiculos.some(x=>x.marca===b)) &&
       (!m || m==="modelo" || vehiculos.some(x=>x.marca===b && x.modelo===m)) &&
       (!t || normalizarBusqueda(p.d)===t) &&
